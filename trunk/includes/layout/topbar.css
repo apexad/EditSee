@@ -1,0 +1,13 @@
+/* editsee topbar active css */
+body {
+	margin-top:40px !important;
+}
+#admin.loggedout, #admin.loggedout:hover {
+	height:40px !important;
+	width:100% !important;
+	display:block !important;
+	background:#404040 !important;
+}
+#admin.loggedout input, #admin.loggedout input:hover {
+	display:inline !important;
+}

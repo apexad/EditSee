@@ -1,0 +1,121 @@
+/* editsee main.css file */
+body {
+	margin:0;
+	margin-top:0px;
+	padding:0;
+	background:url(images/back1.gif);
+	font-family: Arial, Helvetica, sans-serif;
+	font-size:12px;
+	color:#b8babb;
+	text-align:center; 
+}
+a, a:visited { color:#7f8e91; text-decoration:none; outline:none; }
+a:hover { color:#81c8d5; text-decoration:underline; }
+img {
+	border: 0px;
+}
+.links {
+	color:white;
+	text-decoration: none;
+
+}
+.links:hover {text-decoration: underline; }
+
+#page{ 
+	background:url(images/back2.png) no-repeat center top;
+}
+#banner {
+	width:959px;
+	margin:0 auto;
+	color: white;
+	text-align:center;
+	cursor:pointer;
+}
+#full {
+	width:959px;
+	margin:0 auto;
+	text-align:left;
+}
+#main {
+	background:url(images/side.png) repeat-y;
+	padding-bottom:0px;
+}
+#posts { float:left; display:inline; width:570px; margin:0 0 0 5px; }
+.post { margin:60px 0 5px 35px; }
+.post h1 { margin:0 0 4px 0; padding:0; line-height:100%; font-weight: bold; } 
+.post h1 a, .post h1 a:visited, #single h1 { color:#ccc; font-size:16px; line-height:120%; font-weight:bold; font-size: 22px; }
+.post h1 a:hover { text-decoration:none; color:#83bac4; }
+.post-info { margin:0; }
+.post-info li { display:inline; font-size:11px; color:#797f80; margin:0 10px 0 0; }
+.post-content { clear:both; padding:10px 0 0 0; line-height:160%; }
+.post-content p { margin:0 0 1em 0; line-height:160%; }
+.post-content a,.post-content a:visited { text-decoration:underline; }
+.linkred {color:black; font-weight:bold; text-decoration:none; }
+.linkred:hover{text-decoration:underline; }
+.comment_bar {
+	color: black;
+	overflow:hidden; 
+	padding: 1px; 
+	background-color:#C0C0C0;
+	border-color:#C4C4C4;
+	border-style:solid; 
+	border-width:1px; 
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+
+.date_bar {color: white;overflow:hidden; padding: 1px; }
+.calendar { margin-left:-2em; text-align:center; font-size:12px; }
+.calendar span { color:red; }
+#sidebar { float:right; display:inline; width:330px; margin:70px 5px 0 0; }
+#sidebar {
+	width: 30%;
+	float:right;
+	font-size: 12px;
+	font-weight: bold;
+}
+.sidebar_header {
+height: 32px;
+color: #000000;
+margin: 0;
+margin-right: 10px;
+font-size: 18px;
+margin: 0;
+padding: 0 10px 0 28px;
+white-space: nowrap;
+line-height: 32px;
+background: #C0C0C0;
+-moz-border-radius: 5px;
+border-radius: 5px;
+
+}
+.sidebar_content {
+position: relative;
+z-index: 0;
+margin: 0 auto;
+min-width: 1px;
+min-height: 1px;
+}
+.sidebar_content1 {
+position: relative;
+z-index: 0;
+margin-left: 50px;
+min-width: 1px;
+min-height: 1px;
+}
+#page-list { margin:60px 0 5px 35px; }
+#footer_bar {
+        width:959px;
+        margin:0 auto;
+        color: white;
+        text-align:center;
+        background:url(images/back1.gif) no-repeat center top;
+}
+
+/* ---------- clearfix hack ---------- */
+.clearfix:after { content: "."; display: block; clear: both; height: 0; visibility: hidden; }
+.clearfix { display: inline-block; }
+/* exlude MacIE5 \*/
+* html .clearfix { height: 1% }
+.clearfix {display:block;}
+/* end MacIE5 */
