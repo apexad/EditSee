@@ -54,7 +54,7 @@ function Login($username,$password) {
 	$username = $project7->db->_escape_string($username);
 	$password = $project7->db->_escape_string($password);
 	
-	$login_check = $project7->db->_query("select user_id,email from user 
+	$login_check = $project7->db->_query("select user_id,email from ".$project7->db->get_table_prefix()."user 
 										where username='".$username."' and password='".md5($password)."'");
 	if ($login_check->_num_rows() == 1) {
 		$info = $login_check->_fetch_assoc();
@@ -209,7 +209,7 @@ function quickEditPost($post_id,$content,$title) {
 	$project7 = new editsee_App();
 	if ($project7->loggedIn()) {
 		$content = str_replace(array('&lt;','&gt;'),array('<','>'),$content);
-		$query = $project7->db->_query("update post set content='".$project7->db->_escape_string($content)."',title='".$title."' where id='".$post_id."'");
+		$query = $project7->db->_query("update ".$project7->db->get_table_prefix()."post set content='".$project7->db->_escape_string($content)."',title='".$title."' where id='".$post_id."'");
 		$objResponse->assign('post-'.$post_id,'innerHTML',$project7->get_single_post($post_id,'innerHTML'));
 		$_SESSION['in-quick'.$post_id] = 'no';
 	}
@@ -298,7 +298,7 @@ function deletePost($post_id) {
 	$objResponse = new xajaxResponse();
 	$project7 = new editsee_App();
 	if ($project7->loggedIn()) {	
-		//$result = $project7->db->_query("delete from post where id='".$post_id."'");
+		//$result = $project7->db->_query("delete from ".$project7->db->get_table_prefix()."post where id='".$post_id."'");
 		$is_page = $project7->is_page($post_id);
 		$result = $project7->db->_delete_post($post_id);
 		if ($is_page) { $objResponse->redirect($project7->get_config('es_main_url')); }
@@ -322,9 +322,9 @@ function deleteComment($comment_id) {
 	$objResponse = new xajaxResponse();
 	$project7 = new editsee_App();
 	if ($project7->loggedIn()) {
-		$query = $project7->db->_query("select linked_post_id from comments where comment_id='".$comment_id."'");
+		$query = $project7->db->_query("select linked_post_id from ".$project7->db->get_table_prefix()."comments where comment_id='".$comment_id."'");
 		$post_id = $query->_result(0);
-		$project7->db->_query("update comments set date_deleted=now(),deleted='1' where comment_id='".$comment_id."'");
+		$project7->db->_query("update ".$project7->db->get_table_prefix()."comments set date_deleted=now(),deleted='1' where comment_id='".$comment_id."'");
 	}
 	$objResponse->assign("comments","innerHTML",$project7->get_comments($post_id));
 	return $objResponse;
@@ -435,13 +435,13 @@ function forgotPassword($info) {
 	$objResponse = new xajaxResponse();
 	$project7 = new editsee_App();
 	$check_users = $project7->db->_query("select email 
-										from user where username='".$project7->db->_escape_string($info)."'");
+										from ".$project7->db->get_table_prefix()."user where username='".$project7->db->_escape_string($info)."'");
 	if ($check_users->_num_rows() == 1) {
 		$email_address = $check_users->_result(0);	
 	}
 	else {
 		$check_email = $project7->db->_query("select email 
-										from user where email='".$project7->db->_escape_string($info)."'");
+										from ".$project7->db->get_table_prefix()."user where email='".$project7->db->_escape_string($info)."'");
 		if ($check_email->_num_rows() == 1) {
 			$email_address = $check_email->_result(0);	
 		}
@@ -452,7 +452,7 @@ function forgotPassword($info) {
 		$subject = 'editsee password reset for site at '.$_SERVER['HTTP_HOST'];
 		$message = 'Your password has been reset to '.$new_password;
 		if (mail($email_address,$subject,$message)) {
-			$project7->db->_query("update `user` set `password`=md5('".$new_password."') where email='".$email_address."'");
+			$project7->db->_query("update `".$project7->db->get_table_prefix()."user` set `password`=md5('".$new_password."') where email='".$email_address."'");
 			$objResponse->alert("Your password has been reset. Check your e-mail.");
 		}
 		else {
@@ -515,7 +515,7 @@ function setTheme($new_theme) {
 	$objResponse = new xajaxResponse();
 	$project7 = new editsee_App();
 	if ($project7->loggedIn()) {
-		$project7->db->_query("update `config` set data='".$project7->db->_escape_string($new_theme)."' where `option`='es_theme'");
+		$project7->db->_query("update `".$project7->db->get_table_prefix()."config` set data='".$project7->db->_escape_string($new_theme)."' where `option`='es_theme'");
 		$objResponse->redirect($project7->get_config('es_main_url'));
 	}
 	else {
@@ -647,7 +647,7 @@ THEMESELECT;
 							<select id="homepage">
 							<option value="!posts!">-- posts --</option>
 SITESETTINGS;
-				$query = $project7->db->_query("select title,urltag from post 
+				$query = $project7->db->_query("select title,urltag from ".$project7->db->get_table_prefix()."post 
 													where type='page' and deleted='0'
 													order by title desc");
 		while($row = $query->_fetch_assoc()) {
@@ -677,7 +677,7 @@ SITESETTINGS;
 	case 'profile_settings':
 		$project7 = new editsee_App();
 		$username = $_SESSION['username'];
-		$query = $project7->db->_query("select email from user where user_id='".$_SESSION['user_id']."'");
+		$query = $project7->db->_query("select email from ".$project7->db->get_table_prefix()."user where user_id='".$_SESSION['user_id']."'");
 		$email = $query->_result(0);
 		$popup_title = 'Profile Settings';
 		$popup_contents = <<<PROFILESETTINGS
@@ -733,7 +733,7 @@ NEWCAT;
 	break;
 	case 'custom_footer':
 	$project7 = new editsee_App();
-	$query = $project7->db->_query("select data from custom where section='footer' and label='Custom Footer'");
+	$query = $project7->db->_query("select data from ".$project7->db->get_table_prefix()."custom where section='footer' and label='Custom Footer'");
 	if ($query->_num_rows() == 1) {
 		$custom_footer = stripslashes($query->_result(0));
 	}
@@ -781,9 +781,9 @@ function moveLink($link_id,$direction) {
 	$project7 = new editsee_App();
 	if ($project7->loggedIn()) {
 		//get the stuff
-		$query = $project7->db->_query("select link_order from links where link_id='".$link_id."'");
+		$query = $project7->db->_query("select link_order from ".$project7->db->get_table_prefix()."links where link_id='".$link_id."'");
 		$link_order_orginal = $query->_result(0);
-		$query2 = $project7->db->_query("select link_id,link_order from links 
+		$query2 = $project7->db->_query("select link_id,link_order from ".$project7->db->get_table_prefix()."links 
 										where link_order ".$direction." '".$link_order_orginal."' and deleted=0
 										order by link_order ".$orderby." limit 1");
 		$link_order_cutoff = $query2->_fetch_assoc();
@@ -813,7 +813,7 @@ function generateURLTag($title,$post_id) {
 	$urltag_ok = false;
 	$urltag_num = '';
 	while ($urltag_ok !== true) {
-		$urltag_check = $project7->db->_query("select 'post-exists' from post where urltag = '".$urltag.$urltag_num."' and id !='".$post_id."'");
+		$urltag_check = $project7->db->_query("select 'post-exists' from ".$project7->db->get_table_prefix()."post where urltag = '".$urltag.$urltag_num."' and id !='".$post_id."'");
 		if ($urltag_num == '') { $urltag_num = 0; }
 		if ($urltag_check->_num_rows() >= 1) {
 			$urltag_num += 1;

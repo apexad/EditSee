@@ -28,7 +28,7 @@ class editsee_App {
 		if ($this->configFileExists()) {
 			//load the database, populate $this->page
 			require_once($this->config_file);
-			$this->db = new editsee_Database($type, trim($host), trim($user), trim($password), trim($database));
+			$this->db = new editsee_Database($type, trim($host), trim($user), trim($password), trim($database),trim($table_prefix));
 			$this->title = $this->get_config('es_title');
 			$this->header = "\n".'<link rel="alternate" type="application/rss+xml" title="'.$this->get_config('es_title').' &raquo; Feed" href="'.$this->get_config('es_main_url').'feed/" />';
 			$this->header .= "\n".'<link rel="stylesheet" type="text/css" href="'.$this->get_config('es_main_url').'includes/layout/main.css" />';
@@ -38,7 +38,7 @@ class editsee_App {
 			}
 			$this->header .= "\n".'<meta name="generator" content="editsee '.self::version.'" />';
 			$this->footer = '<div id="overlay" style="display: none; position: absolute; top: 0pt; left: 0pt; z-index: 778; width: 100%; height: 2695px;"></div>';
-			$custom_footer = $this->db->_query("select label,data from custom where section='footer'");
+			$custom_footer = $this->db->_query("select label,data from ".$this->db->get_table_prefix()."custom where section='footer'");
 			while ($cf_row = $custom_footer->_fetch_assoc()) {
 				$this->footer .= "\n".'<!-- start '.$cf_row['label'].' -->'."\n".stripslashes($cf_row['data'])."\n".'<!-- end '.$cf_row['label'].'-->'."\n";
 			}
@@ -135,7 +135,7 @@ class editsee_App {
 											$this->get_config('es_title'));
 						$myfeed->SetImage('');
 
-						$query = $this->db->_query("select id,title,urltag,content,date_entered from post 
+						$query = $this->db->_query("select id,title,urltag,content,date_entered from ".$this->db->get_table_prefix()."post 
 													where type='post' and deleted='0' and (date_entered <= NOW())
 													order by date_entered desc");
 						while ($post = $query->_fetch_assoc()) {
@@ -165,7 +165,7 @@ class editsee_App {
 					
 					$editsee_index = '';
 					
-					if (($editsee_request == '') || ($editsee_request == ($this->get_config('es_postpage')).'/') ) {
+					if (($editsee_request == '') || ($editsee_request == ($this->get_config('es_postpage')).'/') || ($editsee_request == 'index.php/') ) {
 						$post_start = 0;
 						$page_number = 1;
 						if (($this->get_config('es_homepage') == '!posts!') || ($editsee_request == ($this->get_config('es_postpage')).'/')) {
@@ -186,7 +186,7 @@ class editsee_App {
 						$editsee_index .= ob_get_contents();
 						ob_end_clean();
 						
-						$query = $this->db->_query("select count(id) from post where type='post' and deleted=0 and date_entered <= NOW()");
+						$query = $this->db->_query("select count(id) from ".$this->db->get_table_prefix()."post where type='post' and deleted=0 and date_entered <= NOW()");
 						$page_count = ceil($query->_result(0)/$this->get_config('es_posts_per_page'));
 						
 						$editsee_index .= '<div id="page-list">';
@@ -217,7 +217,7 @@ class editsee_App {
 						$editsee_index .= '</div>';
 					}
 					else {
-						$query = $this->db->_query("select id,title from post where urltag='".substr($editsee_request,0,-1)."'");
+						$query = $this->db->_query("select id,title from ".$this->db->get_table_prefix()."post where urltag='".substr($editsee_request,0,-1)."'");
 						if ($query->_num_rows() == 1) {
 							$this->is_page = true;
 							$page = $query->_fetch_assoc();
@@ -227,7 +227,7 @@ class editsee_App {
 						else {
 								if (substr($editsee_request,0,5) == 'post/') {
 									if (!$this->loggedIn()) { $if_notloggedin = ' and (date_entered <= NOW())'; }
-									$query = $this->db->_query("select id,title from post 
+									$query = $this->db->_query("select id,title from ".$this->db->get_table_prefix()."post 
 																where (urltag='".substr($editsee_request,5,-1)."' or id='".substr($editsee_request,5,-1)."') 
 																and deleted=0".$if_notloggedin);
 									if ($query->_num_rows() == 1) {
@@ -287,7 +287,7 @@ class editsee_App {
 		}
 	}
 	public function get_config($option) {
-		$query = $this->db->_query("select data from config where `option`='".$this->db->_escape_string($option)."'");
+		$query = $this->db->_query("select data from ".$this->db->get_table_prefix()."config where `option`='".$this->db->_escape_string($option)."'");
 		if ($query->_num_rows() == 1) {
 			$data = $query->_result(0);
 			if ($option == 'es_main_url') {
@@ -298,7 +298,7 @@ class editsee_App {
 			}
 		}
 		else {
-			$this->db->_query("insert into `config`(`option`,`data`) values('".$this->db->_escape_string($option)."','')");
+			$this->db->_query("insert into `".$this->db->get_table_prefix()."config`(`option`,`data`) values('".$this->db->_escape_string($option)."','')");
 			$data = '';
 		}
 		return stripslashes($data);
@@ -307,21 +307,21 @@ class editsee_App {
 		return "select 
 		id,title,content,urltag,in_nav,post.type,date_entered,date_entered
 		,(date_entered <= NOW()) as `live`,tag as `simple_category`,page_order
-		from post 
-		left join post_tags on (post.id=post_tags.post_id and post_tags.type='cat')
-		left join tags on tags.tag_id=post_tags.tag_id
+		from ".$this->db->get_table_prefix()."post post 
+		left join ".$this->db->get_table_prefix()."post_tags post_tags on (post.id=post_tags.post_id and post_tags.type='cat')
+		left join ".$this->db->get_table_prefix()."tags tags on tags.tag_id=post_tags.tag_id
 		where deleted=0 ".$extra; 
 	}
 	public function new_post_select($extra_where,$start) {
 		if ($this->loggedIn()) {
-			return $this->db->_limit_query("post 
-			left join post_tags on (post.id=post_tags.post_id and post_tags.type='cat')
-			left join tags on tags.tag_id=post_tags.tag_id",'id','id,title,content,tag as `simple_category`,urltag,post.type,date_entered,(date_entered <= NOW()) as `live`',$start,$this->get_config('es_posts_per_page'),"deleted=0 and post.type='post'".$extra_where,'date_entered desc');
+			return $this->db->_limit_query($this->db->get_table_prefix()."post post
+			left join ".$this->db->get_table_prefix()."post_tags post_tags on (post.id=post_tags.post_id and post_tags.type='cat')
+			left join ".$this->db->get_table_prefix()."tags tags on tags.tag_id=post_tags.tag_id",'id','id,title,content,tag as `simple_category`,urltag,post.type,date_entered,(date_entered <= NOW()) as `live`',$start,$this->get_config('es_posts_per_page'),"deleted=0 and post.type='post'".$extra_where,'date_entered desc');
 		}
 		else {
-			return $this->db->_limit_query("post 
-			left join post_tags on (post.id=post_tags.post_id and post_tags.type='cat')
-			left join tags on tags.tag_id=post_tags.tag_id",'id','id,title,content,tag as `simple_category`,urltag,post.type,date_entered,(date_entered <= NOW()) as `live`',$start,$this->get_config('es_posts_per_page'),"deleted=0 and post.type='post' and date_entered <= NOW()".$extra_where,'date_entered desc');
+			return $this->db->_limit_query($this->db->get_table_prefix()."post post
+			left join ".$this->db->get_table_prefix()."post_tags post_tags on (post.id=post_tags.post_id and post_tags.type='cat')
+			left join ".$this->db->get_table_prefix()."tags tags on tags.tag_id=post_tags.tag_id",'id','id,title,content,tag as `simple_category`,urltag,post.type,date_entered,(date_entered <= NOW()) as `live`',$start,$this->get_config('es_posts_per_page'),"deleted=0 and post.type='post' and date_entered <= NOW()".$extra_where,'date_entered desc');
 		}
 	}
 	public function get_single_post($post_id,$part='full',$type='post') {
@@ -355,7 +355,7 @@ class editsee_App {
 		return $single_post;
 	}
 	public function get_post_comment_count($post_id) {
-		$query = $this->db->_query("select count(*) from comments where linked_post_id='".$post_id."' and deleted=0");
+		$query = $this->db->_query("select count(*) from ".$this->db->get_table_prefix()."comments where linked_post_id='".$post_id."' and deleted=0");
 		$result = $query->_result(0);
 		if ($result == 0) {
 			return 'No Comments';
@@ -366,7 +366,7 @@ class editsee_App {
 	}
 	public function get_posts($start = 0,$category = 'none') {
 		if ($category != 'none') {
-			$extra_where = " and id in (select post_id from tags t inner join post_tags pt on (t.tag_id=pt.tag_id and pt.type='cat') where tag='".$category."' and t.type='cat')";
+			$extra_where = " and id in (select post_id from ".$this->db->get_table_prefix()."tags t inner ".$this->db->get_table_prefix()."join post_tags pt on (t.tag_id=pt.tag_id and pt.type='cat') where tag='".$category."' and t.type='cat')";
 			//$extra_where = " and simple_category='".$category."'";
 		}
 		else { $extra_where=''; }
@@ -394,7 +394,7 @@ class editsee_App {
 		}
 	}
 	public function get_post_titles($limit,$links = false) {
-		$query = $this->db->_limit_query('post','id','id,title,urltag','0',$limit,"deleted=0 and type='post' and date_entered <= NOW()",'date_entered desc');
+		$query = $this->db->_limit_query($this->db->get_table_prefix().'post','id','id,title,urltag','0',$limit,"deleted=0 and type='post' and date_entered <= NOW()",'date_entered desc');
 		$post_title_array = array();
 		while ($post = $query->_fetch_assoc()) {
 			$post['title'] = stripslashes($post['title']);
@@ -406,9 +406,9 @@ class editsee_App {
 	public function get_links($prepend,$class,$append) {
 		$links = '';
 		$query = $this->db->_query("select link_id,url,title,nofollow,target,link_order
-									 from links where deleted=0 order by link_order asc");
+									 from ".$this->db->get_table_prefix()."links where deleted=0 order by link_order asc");
 		$first_link = true;
-		$max_link = $this->db->_query("select max(link_order) from links");
+		$max_link = $this->db->_query("select max(link_order) from ".$this->db->get_table_prefix()."links");
 		if ($max_link->_num_rows() == 1) {
 			$max_link = $max_link->_result(0);
 		}
@@ -430,7 +430,7 @@ class editsee_App {
 	}
 	public function get_categories($prepend,$value,$append,$selected) {
 		$categories = '';
-		$query = $this->db->_query("select tag from tags where type='cat'");
+		$query = $this->db->_query("select tag from ".$this->db->get_table_prefix()."tags where type='cat'");
 		while ($category = $query->_fetch_assoc()) {
 			$categories .= '<'.$prepend;
 			if ($value == true)
@@ -443,7 +443,7 @@ class editsee_App {
 		return $categories;
 	}
 	public function is_page($post_id) {
-		$query = $this->db->_query("select type from post where id='".$post_id."'");
+		$query = $this->db->_query("select type from ".$this->db->get_table_prefix()."post where id='".$post_id."'");
 		if ($query->_num_rows() == 1) {
 			$type = $query->_result(0);
 		}
@@ -475,7 +475,7 @@ class editsee_App {
 	}
 	public function get_comments($post_id) {
 		$comments = '';
-		$query = $this->db->_query("select `comment_id`,`name`,`comment`,`date_entered` from `comments` 
+		$query = $this->db->_query("select `comment_id`,`name`,`comment`,`date_entered` from `".$this->db->get_table_prefix()."comments` 
 									where linked_post_id='".$post_id."' and deleted=0");
 		if ($query->_num_rows() >= 1) {
 			while ($comment = $query->_fetch_assoc()) {
@@ -489,7 +489,7 @@ class editsee_App {
 		return $comments;
 	}
 	public function get_ad_code($ad_number) {
-		$query = $this->db->_query("select data from custom where section='ad-code-".$ad_number."'");
+		$query = $this->db->_query("select data from ".$this->db->get_table_prefix()."custom where section='ad-code-".$ad_number."'");
 		if ($query->_num_rows() == 1) {
 			return $query->_result(0);
 		}
@@ -498,29 +498,28 @@ class editsee_App {
 		}
 	}
 	public function get_user_email($user_id) {
-		$query = $this->db->_query("select email from user where user_id='".$user_id."'");
+		$query = $this->db->_query("select email from ".$this->db->get_table_prefix()."user where user_id='".$user_id."'");
 		if ($query->_num_rows() == '1') {
 			return $query->_result(0);
 		}
 	}
 	public function get_post_user($post_id) {
-		$query = $this->db->_query("select user_id from post where id='".$post_id."'");
+		$query = $this->db->_query("select user_id from ".$this->db->get_table_prefix()."post where id='".$post_id."'");
 		if ($query->_num_rows() == '1') {
 			return $query->_result(0);
 		}
 	}
 	public function get_post_title($post_id) {
-		$query = $this->db->_query("select title from post where id='".$post_id."'");
+		$query = $this->db->_query("select title from ".$this->db->get_table_prefix()."post where id='".$post_id."'");
 		if ($query->_num_rows() == '1') {
 			return $query->_result(0);
 		}
 	}
 	public function change_password($existing,$new_password) {
-		$query = $this->db->_query("update user 
+		$query = $this->db->_query("update ".$this->db->get_table_prefix()."user 
 										set password=md5('".$this->db->_escape_string($new_password)."') 
 										where user_id='".$_SESSION['user_id']."'
 										and password=md5('".$this->db->_escape_string($existing)."')");
-		echo mysql_error();
 		if ($query->_affected_rows() == 1)
 			return true;
 		else 
@@ -552,7 +551,7 @@ class editsee_App {
 			$type = 'post';
 		}
 
-		$result = $this->db->_query("select * from ".$type." where deleted=1".$extra_where);
+		$result = $this->db->_query("select * from ".$this->db->get_table_prefix().$type." where deleted=1".$extra_where);
 		$return = '';
 		while($row = $result->_fetch_assoc()) {
 			$return .= '<tr><td>'.$row[$title].'</td><td><input type="submit" value="restore" onclick="xajax_unDelete(\''.$row['id'].'\',\''.$type.'\'); return false;" /></td></tr>'; 
