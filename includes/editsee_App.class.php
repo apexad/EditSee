@@ -366,7 +366,7 @@ class editsee_App {
 	}
 	public function get_posts($start = 0,$category = 'none') {
 		if ($category != 'none') {
-			$extra_where = " and id in (select post_id from ".$this->db->get_table_prefix()."tags t inner ".$this->db->get_table_prefix()."join post_tags pt on (t.tag_id=pt.tag_id and pt.type='cat') where tag='".$category."' and t.type='cat')";
+			$extra_where = " and id in (select post_id from ".$this->db->get_table_prefix()."tags t inner join ".$this->db->get_table_prefix()."post_tags pt on (t.tag_id=pt.tag_id and pt.type='cat') where tag='".$category."' and t.type='cat')";
 			//$extra_where = " and simple_category='".$category."'";
 		}
 		else { $extra_where=''; }
