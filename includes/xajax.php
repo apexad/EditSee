@@ -7,7 +7,7 @@ require_once('includes/database/editsee_Database.class.php');
 $xajax = new xajax();
 
 $xajax->register(XAJAX_FUNCTION,"createConfigFile");
-function createConfigFile($name,$type,$host,$user,$password,$database,$table_prefix,$admin_user,$admin_password,$admin_email) {
+function createConfigFile($name,$type,$host,$user,$password,$database,$table_prefix,$admin_user,$admin_password,$admin_email,$site_title) {
 	$objResponse = new xajaxResponse();
 	$project7 = new editsee_App();
 
@@ -24,15 +24,29 @@ $table_prefix   = '."'$table_prefix';".'
 			$filehandle = fopen($filename, 'w') or die("can't open file");
 			fwrite($filehandle, $content);
 			fclose($filehandle);
-			/*$insert_query = $project7->db->_insert_user($admin_user,$admin_password,$admin_email);
-			if ($insert_query->_affected_rows() == 1) {
+			$project7->connectDatabase();
+			//attempt to create the user table
+			$table_created = $project7->db->_query("
+						CREATE TABLE IF NOT EXISTS `".$table_prefix."user` (
+						`user_id` int(11) NOT NULL AUTO_INCREMENT,
+  						`username` varchar(255) NOT NULL,
+  						`email` varchar(255) NOT NULL,
+  						`password` char(32) NOT NULL,
+  						PRIMARY KEY (`user_id`),
+						UNIQUE KEY `username` (`username`),
+						UNIQUE KEY `e-mail` (`email`)
+						) ENGINE=MyISAM  DEFAULT CHARSET=utf8;");
+
+			if ($table_created) {
+				$insert_query = $project7->db->_insert_user($admin_user,$admin_password,$admin_email);
+				include('includes/database/editsee_Database.create.php');
 				$script_uri = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
 				$objResponse->redirect($script_uri);
 			}
 			else {
 				unlink($filename);
 				$objResponse->alert('unable to insert into database!');
-			}*/
+			}
 	}
 	else { 
 		$objResponse->alert("Bad config file name!");
@@ -789,8 +803,8 @@ function moveLink($link_id,$direction) {
 		$link_order_cutoff = $query2->_fetch_assoc();
 		
 		//fix the stuff
-		$project7->db->_query("update links set link_order='".$link_order_cutoff['link_order']."' where link_id='".$link_id."'");
-		$project7->db->_query("update links set link_order='".$link_order_orginal."' where link_id='".$link_order_cutoff['link_id']."'");
+		$project7->db->_query("update ".$project7->db->get_table_prefix()."links set link_order='".$link_order_cutoff['link_order']."' where link_id='".$link_id."'");
+		$project7->db->_query("update ".$project7->db->get_table_prefix()."links set link_order='".$link_order_orginal."' where link_id='".$link_order_cutoff['link_id']."'");
 		
 		ob_start();
 		$project7->display('sidebar-only');

@@ -48,6 +48,7 @@ class editsee_Database {
 			break;
 			default:
 			case 'mysql':
+				echo mysql_error();
 				return new editsee_DatabaseResult($this->type,mysql_query($sql,$this->db));
 			break;
 		}

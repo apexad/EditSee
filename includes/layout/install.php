@@ -84,7 +84,7 @@ global $xajax;
 	</tr>
 	<tr>
 		<td>Admin E-Mail Address:</td>
-		<td><input type="text" id="admin_email"</td>
+		<td><input type="text" id="admin_email"></td>
 		<td></td>
 	</tr>
 	<tr>
@@ -99,7 +99,8 @@ global $xajax;
 			,document.getElementById('db_tableprefix').value
 			,document.getElementById('admin_user').value
 			,document.getElementById('admin_password').value
-			,document.getElementById('admin_email').value); return false;">Install EditSee</button>
+			,document.getElementById('admin_email').value
+			,document.getElementById('site_title').value); return false;">Install EditSee</button>
 		</td>
 	</tr>
 </table>
