@@ -65,6 +65,14 @@ class editsee_App {
 			return false;
 		}
 	}
+	public function connectDatabase() {
+		if ($this->configFileExists()) {
+			//load the database, populate $this->page
+			require_once($this->config_file);
+			$this->db = new editsee_Database($type, trim($host), trim($user), trim($password), trim($database),trim($table_prefix));
+		}
+	}
+
 	public function loggedIn() {
 		session_start();
 	if(isset($_SESSION['username']))
@@ -204,11 +212,11 @@ class editsee_App {
 									if ($this->get_config('es_homepage') != '!posts!') {
 										$editsee_index .= $this->get_config('es_postpage');
 									}
-									$editsee_index .= '">1</a>&nbsp;';
+									if ($page_count > 1) { $editsee_index .= '">1</a>&nbsp;'; }
 								}
 							}
 							else {
-								$editsee_index .= $i.'&nbsp;';
+								if ($page_count > 1) { $editsee_index .= $i.'&nbsp;'; }
 							}
 						}
 						if ($page_number < $page_count) {
