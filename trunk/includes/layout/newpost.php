@@ -31,11 +31,11 @@
 		<tr>
 			<td>Page Order:<br/>
 				<?php
-				$query = $project7->db->_query("select title,page_order from post 
-													where type='page' and deleted='0'
-													order by title desc");
+				$query = $project7->db->_query("select title,page_order 
+								from ".$project7->db->get_table_prefix()."post 
+								where type='page' and deleted='0' order by title desc");
 				if ($post['id'] != 'new') {
-					$after_page = $project7->db->_query("select page_order from post 
+					$after_page = $project7->db->_query("select page_order from ".$project7->db->get_table_prefix()."post 
 					where page_order < '".$post['page_order']."' and type='page' order by page_order desc limit 1");
 					$begin = true;
 					if ($after_page->_num_rows() == 1) {

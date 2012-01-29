@@ -115,7 +115,7 @@ class editsee_Database {
 
 			break;
 			case 'after':
-				$this->_query("update ".$this->table_prefix."post set page_order=(page_order+1) where (page_order > ".$page_order_after.") and type='page'");
+				$this->_query("update ".$this->table_prefix."post set page_order=(page_order+1) where page_order > '".$page_order_after."' and type='page'");
 				$page_order = $page_order_after+1;
 			break;
 		}
@@ -130,7 +130,7 @@ class editsee_Database {
 		$this->_query("delete from ".$this->table_prefix."post_tags where post_id='".$id."' and type='cat'");
 		$this->_query("insert into ".$this->table_prefix."post_tags(post_id,tag_id,type) 
 		values('".$id."','".$category_id."','cat')");
-		return $main_insert;
+		return $id;
 	}
 	public function _insert_link($link_url,$link_title,$link_nofollow,$link_target) {
 		$link_url = $this->_escape_string($link_url);
@@ -220,7 +220,7 @@ class editsee_Database {
 		$this->_query("update ".$this->table_prefix."config set data='".$this->_escape_string($homepage)."' where `option`='es_homepage'");
 		$this->_query("update ".$this->table_prefix."config set data='".$this->_escape_string($postpage)."' where `option`='es_postpage'");
 		$this->_query("update ".$this->table_prefix."config set data='".$email_comments."' where `option`='es_email_comments'");
-		//$this->_query("update post set user_id='".$_SESSION['user_id']."' where user_id='0'");
+		//$this->_query("update ".$this->table_prefix."post set user_id='".$_SESSION['user_id']."' where user_id='0'");
 }
 	public function _update_user($username,$email) {
 		return $this->_query("update ".$this->table_prefix."user set username='".$this->_escape_string($username)."',email='".$this->_escape_string($email)."' where user_id='".$_SESSION['user_id']."'");
