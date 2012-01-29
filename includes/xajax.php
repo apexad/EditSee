@@ -163,8 +163,7 @@ function addPost($id,$title,$content,$category,$urltag,$type,$date,$in_nav,$page
 				$objResponse->assign('posts','innerHTML',$output);
 			}
 			else if ($id == 'new' && $type == 'page') {
-				$new_id = $insert_query->_insert_id();
-				$objResponse->assign('new-post','innerHTML',$project7->get_single_post($new_id,'innerHTML'));
+				$objResponse->assign('new-post','innerHTML',$project7->get_single_post($insert_query,'innerHTML'));
 			}
 			else {
 				$objResponse->assign('post-'.$id,'innerHTML',$project7->get_single_post($id,'innerHTML'));
@@ -174,6 +173,7 @@ function addPost($id,$title,$content,$category,$urltag,$type,$date,$in_nav,$page
 			$output = ob_get_contents();
 			ob_end_clean();
 			$objResponse->assign('page-menu','innerHTML',$output);
+			$objResponse->assign('main-nav','innerHTML',$output);
 			
 			ob_start();
 			$project7->display('sidebar-only');
