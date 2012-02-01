@@ -1,7 +1,9 @@
+<?php if (file_exists('images/logo.png')) { /*don't display about in sidebar if it's on top*/ ?>
 		<section class="widget">
 			<h4 class="widgettitle">About</h4>
 			<?=$this->get_config('es_description')?>
 		</section>
+<?php } ?>
 		
 		<section class="widget">
 			<h4 class="widgettitle">Recent Posts</h4>

@@ -69,9 +69,10 @@ class editsee_Database {
 			break;
 		}
 	}
-	public function _insert_user($user,$password,$email) {
-		return $this->_query("insert into ".$this->table_prefix."user(username,password,email) values(
+	public function _insert_user($user,$role,$password,$email) {
+		return $this->_query("insert into ".$this->table_prefix."user(username,role,password,email) values(
 									'".$this->_escape_string($user)."'
+									,'".$role."'
 									,md5('".$this->_escape_string($password)."')
 									,'".$this->_escape_string($email)."')");
 	}
