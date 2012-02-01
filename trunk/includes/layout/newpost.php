@@ -6,7 +6,7 @@
 <form id="new_post_form" onsubmit="return false;">
 	<table class="new-post">
 		<tr>
-			<td>Title:<br/><textarea name="post_title" id="post_title" onblur="xajax_generateURLTag(this.value,'<?=$post['id']?>')"><?=$post['title']?></textarea></td>
+			<td>Title:<br/><textarea name="post_title" id="post_title" onblur="xajax_generatePostData('<?=$post['id']?>','urltag',this.value)"><?=$post['title']?></textarea></td>
 		</tr>
 		<tr>
 			<td>Category:<br/><?php
@@ -66,7 +66,7 @@
 		<?php
 		}
 		?>
-		<tr><td>Post Date (format- YYYY-MM-DD hh:mm:ss, 24 hour):<br/>
+		<tr><td>Post Date (format- YYYY-MM-DD hh:mm:ss, 24 hour): <button onclick="xajax_generatePostData('<?=$post['id']?>','reset-date')">Reset To Now</button><br/>
 			<input type="text" id="post_date" value="<?php
 			if (!empty($post['date_entered'])) {
 				echo $post['date_entered'];

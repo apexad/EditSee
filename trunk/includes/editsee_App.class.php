@@ -80,6 +80,22 @@ class editsee_App {
 	else
 		return false;
 	}
+	public function isAdmin() {
+		//first ever auto-database update for EditSee, completed 02-01-2012
+		$test_role = $this->db->_query("SHOW COLUMNS FROM  `".$this->db->get_table_prefix()."user` LIKE  'role'");
+		if ($test_role->_num_rows() == 0) {
+			//add role field
+			$this->db->_query("ALTER TABLE  `".$this->db->get_table_prefix()."user` ADD  `role` VARCHAR( 6 ) NOT NULL AFTER  `username`");
+			$this->db->_query("UPDATE `".$this->db->get_table_prefix()."user` set role='admin'"); //default all current users to admins
+		}
+		$admin_check = $this->db->_query("select role from `".$this->db->get_table_prefix()."user` where username='".$_SESSION['username']."'");
+		if ($admin_check->_result(0) == 'admin') {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 	public function display($part = 'all') {
 		switch ($part) {
 			case 'page-menu-only':

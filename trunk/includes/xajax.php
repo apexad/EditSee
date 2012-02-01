@@ -30,6 +30,7 @@ $table_prefix   = '."'$table_prefix';".'
 						CREATE TABLE IF NOT EXISTS `".$table_prefix."user` (
 						`user_id` int(11) NOT NULL AUTO_INCREMENT,
   						`username` varchar(255) NOT NULL,
+  						`role` varchar(6) NOT NULL,
   						`email` varchar(255) NOT NULL,
   						`password` char(32) NOT NULL,
   						PRIMARY KEY (`user_id`),
@@ -38,7 +39,7 @@ $table_prefix   = '."'$table_prefix';".'
 						) ENGINE=MyISAM  DEFAULT CHARSET=utf8;");
 
 			if ($table_created) {
-				$insert_query = $project7->db->_insert_user($admin_user,$admin_password,$admin_email);
+				$insert_query = $project7->db->_insert_user($admin_user,'admin',$admin_password,$admin_email);
 				include('includes/database/editsee_Database.create.php');
 				$script_uri = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
 				$objResponse->redirect($script_uri);
@@ -818,29 +819,33 @@ function moveLink($link_id,$direction) {
 	return $objResponse;
 }
 
-$xajax->register(XAJAX_FUNCTION,"generateURLTag");
-function generateURLTag($title,$post_id) {
+$xajax->register(XAJAX_FUNCTION,"generatePostData");
+function generatePostData($post_id,$type,$data='') {
 	$objResponse = new xajaxResponse();
-	$urltag = str_replace(' ','-',strtolower($title));
-	$urltag = ereg_replace("[^A-Za-z0-9-]", "", $urltag);
-	$project7 = new editsee_App();
-	$urltag_ok = false;
-	$urltag_num = '';
-	while ($urltag_ok !== true) {
-		$urltag_check = $project7->db->_query("select 'post-exists' from ".$project7->db->get_table_prefix()."post where urltag = '".$urltag.$urltag_num."' and id !='".$post_id."'");
-		if ($urltag_num == '') { $urltag_num = 0; }
-		if ($urltag_check->_num_rows() >= 1) {
-			$urltag_num += 1;
+	if ($type == 'urltag') {
+		$urltag = str_replace(' ','-',strtolower($data));
+		$urltag = ereg_replace("[^A-Za-z0-9-]", "", $urltag);
+		$project7 = new editsee_App();
+		$urltag_ok = false;
+		$urltag_num = '';
+		while ($urltag_ok !== true) {
+			$urltag_check = $project7->db->_query("select 'post-exists' from ".$project7->db->get_table_prefix()."post where urltag = '".$urltag.$urltag_num."' and id !='".$post_id."'");
+			if ($urltag_num == '') { $urltag_num = 0; }
+			if ($urltag_check->_num_rows() >= 1) {
+				$urltag_num += 1;
+			}
+			else {
+				$urltag_ok = true;
+			}
 		}
-		else {
-			$urltag_ok = true;
+		if ($urltag_num > 0) {
+			$urltag .= $urltag_num;
 		}
-		//echo $urltag_num; exit();
+		$objResponse->assign('post_urltag','value',$urltag);
 	}
-	if ($urltag_num > 0) {
-		$urltag .= $urltag_num;
+	if ($type == 'reset-date') {
+		$objResponse->assign('post_date',value,date('Y-m-d H:i:s'));
 	}
-	$objResponse->assign('post_urltag','value',$urltag);
 	
 	return $objResponse;
 }
