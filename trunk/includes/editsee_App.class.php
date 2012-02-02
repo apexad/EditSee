@@ -98,6 +98,13 @@ class editsee_App {
 			return false;
 		}
 	}
+	public function notLoggedIn($needsAdmin = false) {
+		$message = 'Not logged in';
+		if ($needsAdmin) {;
+			$message .= ' as an Admin';
+		}
+		return $message.'!';
+	}
 	public function display($part = 'all') {
 		switch ($part) {
 			case 'page-menu-only':

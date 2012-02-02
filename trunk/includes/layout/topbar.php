@@ -39,10 +39,19 @@ if (!empty($_SESSION['username']) && !empty($_SESSION['temp_theme'])) {
 if (!empty($_SESSION['username']) && empty($_SESSION['temp_theme'])) {
 ?>
 <ul id="menu">
+<?php 
+	if ($this->isAdmin()) {
+?>
 	<li><a href="#" onclick="return false;">Content</a>
 		<ul>
+<?php
+	} //ends if (isAdmin())
+?>
 			<li><a onclick="xajax_updatePost('new'); return false;">New Post</a></li>
 			<li><a onclick="xajax_updatePost('new','page'); return false;">New Page</a></li>
+<?php 
+	if ($this->isAdmin()) {
+?>
 			<li><a onclick="xajax_openPopup('new_link')">New Link</a></li>
 			<li><a onclick="xajax_openPopup('undelete')">Restore Posts</a></li>
 		</ul>
@@ -58,14 +67,12 @@ if (!empty($_SESSION['username']) && empty($_SESSION['temp_theme'])) {
 			<li><a onclick="xajax_loadThemeConfig(); return false;">Theme Config</a></li>
 <?php } ?>
 			<li><a onclick="xajax_openPopup('theme_selector'); return false;" class="b">Change Theme</a></li>
-<?php 
-	if ($this->isAdmin()) {
-?>
 			<li><a onclick="xajax_openPopup('mange_users'); return false;">Manage Users</a></li>
+	</ul>
 <?php
-	}
+	} //ends if (isAdmin())
 ?>
-		</ul>
+	
 	</li>
 	<li class="login"><a href="#" onclick="return false;"><?=$_SESSION['username']?></a>
 		<ul>
