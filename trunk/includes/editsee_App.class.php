@@ -211,36 +211,6 @@ class editsee_App {
 						$this->get_posts($post_start);
 						$editsee_index .= ob_get_contents();
 						ob_end_clean();
-						
-						$query = $this->db->_query("select count(id) from ".$this->db->get_table_prefix()."post where type='post' and deleted=0 and date_entered <= NOW()");
-						$page_count = ceil($query->_result(0)/$this->get_config('es_posts_per_page'));
-						
-						$editsee_index .= '<div id="page-list">';
-						if ($page_number  > 1) {
-							$editsee_index .= '<a href="'.$this->get_config('es_main_url').'page/'.($page_number-1).'">&lt;newer</a>&nbsp;';
-						}
-						for($i='1';$i <= $page_count;$i++) {
-							if ($i != $page_number) {
-								if ($i > 1) {
-									$editsee_index .= '<a href="'.$this->get_config('es_main_url').'page/'.$i.'">'.$i.'</a>&nbsp;';
-								}
-								else {
-									
-									$editsee_index .= '<a href="'.$this->get_config('es_main_url');
-									if ($this->get_config('es_homepage') != '!posts!') {
-										$editsee_index .= $this->get_config('es_postpage');
-									}
-									if ($page_count > 1) { $editsee_index .= '">1</a>&nbsp;'; }
-								}
-							}
-							else {
-								if ($page_count > 1) { $editsee_index .= $i.'&nbsp;'; }
-							}
-						}
-						if ($page_number < $page_count) {
-							$editsee_index .= '<a href="'.$this->get_config('es_main_url').'page/'.($page_number+1).'">older&gt;</a>';
-						}
-						$editsee_index .= '</div>';
 					}
 					else {
 						$query = $this->db->_query("select id,title from ".$this->db->get_table_prefix()."post where urltag='".substr($editsee_request,0,-1)."'");
@@ -418,6 +388,35 @@ class editsee_App {
 				echo $post_html;
 			}
 		}
+		$query = $this->db->_query("select count(id) from ".$this->db->get_table_prefix()."post where type='post' and deleted=0 and date_entered <= NOW()");
+		$page_count = ceil($query->_result(0)/$this->get_config('es_posts_per_page'));
+		$page_list = '<p id="page-list">';
+		$page_number = ($start/$this->get_config('es_posts_per_page'))+1;
+		if ($page_number  > 1) {
+			$page_list .= '<a href="'.$this->get_config('es_main_url').'page/'.($page_number-1).'">&lt;newer</a>&nbsp;';
+		}
+		for($i='1';$i <= $page_count;$i++) {
+			if ($i != $page_number) {
+				if ($i > 1) {
+					$page_list .= '<a href="'.$this->get_config('es_main_url').'page/'.$i.'">'.$i.'</a>&nbsp;';
+				}
+				else {
+					$page_list .= '<a href="'.$this->get_config('es_main_url');
+					if ($this->get_config('es_homepage') != '!posts!') {
+						$page_list .= $this->get_config('es_postpage');
+					}
+					if ($page_count > 1) { $page_list .= '">1</a> '; }
+				}
+			}
+			else {
+					if ($page_count > 1) { $page_list .= $i.'&nbsp;'; }
+			}
+		}
+		if ($page_number < $page_count) {
+			$page_list .= '<a href="'.$this->get_config('es_main_url').'page/'.($page_number+1).'">older&gt;</a>';
+		}
+		$page_list .= '</p>';
+		echo $page_list;
 	}
 	public function get_post_titles($limit,$links = false) {
 		$query = $this->db->_limit_query($this->db->get_table_prefix().'post','id','id,title,urltag','0',$limit,"deleted=0 and type='post' and date_entered <= NOW()",'date_entered desc');
