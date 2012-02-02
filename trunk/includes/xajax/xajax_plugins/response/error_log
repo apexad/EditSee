@@ -1,2 +1,0 @@
-[16-Dec-2011 04:22:17] PHP Fatal error:  Class 'xajaxResponsePlugin' not found in /home/editsee/public_html/includes/xajax/xajax_plugins/response/googleMap.inc.php on line 2
-[16-Dec-2011 04:33:46] PHP Fatal error:  Cannot redeclare class xajaxRequestPlugin in /home/editsee/public_html/includes/xajax/xajax_core/xajaxPlugin.inc.php on line 106

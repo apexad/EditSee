@@ -45,7 +45,6 @@ if (!empty($_SESSION['username']) && empty($_SESSION['temp_theme'])) {
 			<li><a onclick="xajax_updatePost('new','page'); return false;">New Page</a></li>
 			<li><a onclick="xajax_openPopup('new_link')">New Link</a></li>
 			<li><a onclick="xajax_openPopup('undelete')">Restore Posts</a></li>
-			<li><a onclick="xajax_openPopup('new_bugreport')" class="b">(Bug Report)</a></li>
 		</ul>
 	</li>
 	<li><a href="#" onclick="return false;">Settings</a>

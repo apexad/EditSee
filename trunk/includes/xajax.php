@@ -481,19 +481,6 @@ function forgotPassword($info) {
 	$objResponse->removeCSS('includes/layout/overlay.css');
 	return $objResponse;
 }
-$xajax->register(XAJAX_FUNCTION,"editseeBugReport");
-function editseeBugReport($title,$steps,$details) {
-	$objResponse = new xajaxResponse();
-	if (mail('alex@apexad.net',$title,'steps'."\n".$steps."\n".'details'."\n".$details)) {
-		$objResponse->alert('Bug report sent to developer!');
-	}
-	else {
-		$objResponse->alert('There was an error sending the bug report.');
-	}
-	$objResponse->remove('popup');
-	$objResponse->removeCSS('includes/layout/overlay.css');
-	return $objResponse;
-}
 $xajax->register(XAJAX_FUNCTION,"newCategory");
 function newCategory($category) {
 	$objResponse = new xajaxResponse();
@@ -719,22 +706,6 @@ PROFILESETTINGS;
 													document.getElementById('information').value
 												); return false;" />
 FORGOTPASSWORD;
-	break;
-	case 'new_bugreport':
-	$popup_title = 'New Bug Report';
-	$popup_contents = <<<BUGREPORT
-	<form id="editsee_bug_report">
-	<table>
-	<tr><td>Title:</td><td><input type="text" id="bug_title" /></td></tr>
-	<tr><td>Steps To Duplicate:</td><td><textarea id="steps"></textarea></td></tr>
-	<tr><td>Details Of Bug:</td><td><textarea id="bug_details"></textarea></td></tr>
-	<tr><td colspan="2" class="submit">
-	<input type="submit" value="submit bug" onclick="xajax_editseeBugReport(
-													document.getElementById('bug_title').value
-													,document.getElementById('steps').value
-													,document.getElementById('bug_details').value
-													); return false;" />
-BUGREPORT;
 	break;
 	case 'new_category':
 		$popup_title = 'New Category';
