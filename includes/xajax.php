@@ -191,7 +191,7 @@ function addPost($id,$title,$content,$category,$urltag,$type,$date,$in_nav,$page
 		}
 	}
 	else {
-		$objResponse->alert("Not Logged In!");
+		$objResponse->alert($project7->notLoggedIn());
 	}
 	return $objResponse;
 }
@@ -199,12 +199,12 @@ $xajax->register(XAJAX_FUNCTION,"unDelete");
 function unDelete($id,$type) {
 	$objResponse = new xajaxResponse();
 	$project7 = new editsee_App();
-	if ($project7->loggedIn()) {
+	if ($project7->loggedIn() && $project7->isAdmin()) {
 		$project7->db->_un_delete($id,$type);
 		$objResponse->redirect($project7->get_config('es_main"url'));
 	}
 	else {
-		$objResponse->alert("Not Logged in!");
+		$objResponse->alert($project7->notLoggedIn(true));
 	}
 	return $objResponse;
 }
@@ -212,11 +212,11 @@ $xajax->register(XAJAX_FUNCTION,"undeleteList");
 function undeleteList($type) {
 	$objResponse = new xajaxResponse();
 	$project7 = new editsee_App();
-	if ($project7->loggedIn()) {
+	if ($project7->loggedIn() && $project7->isAdmin()) {
 		$objResponse->assign('undelete_items','innerHTML',$project7->undeleteList($type));
 	}
 	else {
-		$objResponse->alert("Not Logged in!");
+		$objResponse->alert($project7->notLoggedIn(true));
 	}
 	return $objResponse;
 }
@@ -231,7 +231,7 @@ function quickEditPost($post_id,$content,$title) {
 		$_SESSION['in-quick'.$post_id] = 'no';
 	}
 	else {
-		$objResponse->alert("Not Logged In!");
+		$objResponse->alert($project7->notLoggedIn());
 	}
 	return $objResponse;
 	
@@ -306,7 +306,7 @@ true,uploadURI : 'http://".$_SERVER['HTTP_HOST']."/nicUpload.php'}).panelInstanc
 		}
 	}
 	else {
-		$objResponse->alert("Not Logged In!");
+		$objResponse->alert($project7->notLoggedIn());
 	}
 	return $objResponse;
 }
@@ -314,7 +314,7 @@ $xajax->register(XAJAX_FUNCTION,"deletePost");
 function deletePost($post_id) {
 	$objResponse = new xajaxResponse();
 	$project7 = new editsee_App();
-	if ($project7->loggedIn()) {	
+	if ($project7->loggedIn() && $project7->isAdmin()) {	
 		//$result = $project7->db->_query("delete from ".$project7->db->get_table_prefix()."post where id='".$post_id."'");
 		$is_page = $project7->is_page($post_id);
 		$result = $project7->db->_delete_post($post_id);
@@ -330,7 +330,7 @@ function deletePost($post_id) {
 		}
 	}
 	else {
-		$objResponse->alert("Not Logged In!");
+		$objResponse->alert($project7->notLoggedIn(true));
 	}
 	return $objResponse;
 }
@@ -338,12 +338,15 @@ $xajax->register(XAJAX_FUNCTION,"deleteComment");
 function deleteComment($comment_id) {
 	$objResponse = new xajaxResponse();
 	$project7 = new editsee_App();
-	if ($project7->loggedIn()) {
+	if ($project7->loggedIn() && $project7->isAdmin()) {
 		$query = $project7->db->_query("select linked_post_id from ".$project7->db->get_table_prefix()."comments where comment_id='".$comment_id."'");
 		$post_id = $query->_result(0);
 		$project7->db->_query("update ".$project7->db->get_table_prefix()."comments set date_deleted=now(),deleted='1' where comment_id='".$comment_id."'");
+		$objResponse->assign("comments","innerHTML",$project7->get_comments($post_id));
 	}
-	$objResponse->assign("comments","innerHTML",$project7->get_comments($post_id));
+	else {
+		$objResponse->alert($project7->notLoggedIn(true));
+	}
 	return $objResponse;
 }	
 $xajax->register(XAJAX_FUNCTION,"changePassword");
@@ -362,11 +365,11 @@ function changePassword($existing,$new_password,$retype_password) {
 			$objResponse->removeCSS('includes/layout/overlay.css');
 		}
 		else {
-			$objResponse->alert("You did not type in the same password");
+			$objResponse->alert("Password and re-typed password do not match!");
 		}
 	}
 	else {
-		$objResponse->alert("Not Logged In!");
+		$objResponse->alert($project7->notLoggedIn());
 	}
 	return $objResponse;
 }
@@ -374,7 +377,7 @@ $xajax->register(XAJAX_FUNCTION,"newLink");
 function newLink($link_url,$link_title,$link_nofollow,$link_target) {
 	$objResponse = new xajaxResponse();
 	$project7 = new editsee_App();
-	if ($project7->loggedIn()) {
+	if ($project7->loggedIn() && $project7->isAdmin()) {
 		if (!empty($link_url) && !empty($link_title)) {
 			$project7->db->_insert_link($link_url,$link_title,$link_nofollow,$link_target);
 			ob_start();
@@ -390,7 +393,7 @@ function newLink($link_url,$link_title,$link_nofollow,$link_target) {
 		}
 	}
 	else {
-		$objResponse->alert("Not Logged In!");
+		$objResponse->alert($project7->notLoggedIn(true));
 	}
 	return $objResponse;
 }
@@ -398,9 +401,8 @@ $xajax->register(XAJAX_FUNCTION,"deleteLink");
 function deleteLink($link_id) {
 	$objResponse = new xajaxResponse();
 	$project7 = new editsee_App();
-	if ($project7->loggedIn()) {	
+	if ($project7->loggedIn() && $project7->isAdmin()) {	
 		$result = $project7->db->_delete_link($link_id);
-		
 		//reload the sidebar
 		ob_start();
 		$project7->display('sidebar-only');
@@ -409,7 +411,7 @@ function deleteLink($link_id) {
 		$objResponse->assign('sidebar','innerHTML',$output);
 	}
 	else {
-		$objResponse->alert("Not Logged In!");
+		$objResponse->alert($project7->notLoggedIn(true));
 	}
 	return $objResponse;
 }
@@ -417,13 +419,13 @@ $xajax->register(XAJAX_FUNCTION,"siteSettings");
 function siteSettings($site_title,$site_url,$site_desc,$posts_per_page,$homepage,$postpage,$email_comments) {
 	$objResponse = new xajaxResponse();
 	$project7 = new editsee_App();
-	if ($project7->loggedIn()) {
+	if ($project7->loggedIn() && $project7->isAdmin()) {
 		$email_comments = ($email_comments) ? '1' : '0';
 		$project7->db->_update_options($site_title,$site_url,$site_desc,$posts_per_page,$homepage,$postpage,$email_comments);
 		$objResponse->redirect($project7->get_config('es_main_url'));
 	}
 	else {
-		$objResponse->alert('Not Logged In!');
+		$objResponse->alert($project7->notLoggedIn(true));
 	}
 	return $objResponse;
 }
@@ -443,7 +445,7 @@ function profileSettings($username,$email) {
 		}
 	}
 	else {
-		$objResponse->alert('Not Logged In!');
+		$objResponse->alert($project7->notLoggedIn());
 	}
 	return $objResponse;
 }
@@ -494,7 +496,7 @@ function newCategory($category) {
 		$objResponse->removeCSS('includes/layout/overlay.css');
 	}
 	else {
-		$objResponse->alert("Not Logged In!");
+		$objResponse->alert($project7->notLoggedIn());
 	}
 	return $objResponse;
 }
@@ -502,14 +504,14 @@ $xajax->register(XAJAX_FUNCTION,"customSection");
 function customSection($section,$label,$data) {
 	$objResponse = new xajaxResponse();
 	$project7 = new editsee_App();
-	if ($project7->loggedIn()) {
+	if ($project7->loggedIn() && $project7->isAdmin()) {
 		$project7->db->_insert_custom_section($section,$label,$data);
 		$objResponse->append('footer','innerHTML',$data);
 		$objResponse->remove("popup");
 		$objResponse->removeCSS('includes/layout/overlay.css');
 	}
 	else {
-		$objResponse->alert("Not Logged In!");
+		$objResponse->alert($project7->notLoggedIn(true));
 	}
 	return $objResponse;
 }
@@ -518,12 +520,12 @@ function setTheme($new_theme) {
 	$_SESSION['temp_theme'] = '';
 	$objResponse = new xajaxResponse();
 	$project7 = new editsee_App();
-	if ($project7->loggedIn()) {
+	if ($project7->loggedIn() && $project7->isAdmin()) {
 		$project7->db->_query("update `".$project7->db->get_table_prefix()."config` set data='".$project7->db->_escape_string($new_theme)."' where `option`='es_theme'");
 		$objResponse->redirect($project7->get_config('es_main_url'));
 	}
 	else {
-		$objResponse->alert("Not Logged In!");
+		$objResponse->alert($project7->notLoggedIn(true));
 	}
 	return $objResponse;
 }
@@ -531,7 +533,7 @@ $xajax->register(XAJAX_FUNCTION,"previewTheme");
 function previewTheme($preview_theme,$revert='no') {
 	$objResponse = new xajaxResponse();
 	$project7 = new editsee_App();
-	if ($project7->loggedIn()) {
+	if ($project7->loggedIn() && $project7->isAdmin()) {
 		if ($revert == 'no') {
 			$_SESSION['temp_theme'] = $project7->db->_escape_string($preview_theme);
 		}
@@ -541,7 +543,7 @@ function previewTheme($preview_theme,$revert='no') {
 		$objResponse->redirect($project7->get_config('es_main_url'));
 	}
 	else {
-		$objResponse->alert("Not Logged In!");
+		$objResponse->alert($project7->notLoggedIn(true));
 	}
 	return $objResponse;
 }
@@ -739,6 +741,9 @@ NEWCAT;
 																			,document.getElementById('custom_footer_code').value); return false;" />
 CUSTOMFOOTER;
 	break;
+	default:
+		$popup_title = ucwords(str_replace('_',' ',$popup));
+		$popup_contents .= '<p>This popup does not exist, yet!</p><table><tr><td class="submit">';
 	}
 	$popup_contents .= '<input type="submit" value="cancel" onclick="xajax_closePopup(); return false;" /></td></tr>
 		</table>
@@ -787,7 +792,7 @@ function moveLink($link_id,$direction) {
 		$objResponse->assign('sidebar','innerHTML',$new_sidebar);
 	}
 	else {
-		$objResponse->alert("Not Logged In!");
+		$objResponse->alert($project7->notLoggedIn());
 	}
 	return $objResponse;
 }
