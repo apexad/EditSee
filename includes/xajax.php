@@ -6,12 +6,14 @@ require_once("includes/editsee_App.class.php");
 require_once('includes/database/editsee_Database.class.php');
 $xajax = new xajax();
 
-$xajax->register(XAJAX_FUNCTION,"createConfigFile");
+if (!editsee_App::configFileExists()) {
+	$xajax->register(XAJAX_FUNCTION,"createConfigFile");
+}
 function createConfigFile($name,$type,$host,$user,$password,$database,$table_prefix,$admin_user,$admin_password,$admin_email,$site_title) {
 	$objResponse = new xajaxResponse();
 	$project7 = new editsee_App();
 
-	if ((preg_match('/\w*config\w*\.php/',$name) == 1) && (!$project7->configFileExists()) ){
+	if ((preg_match('/\w*config\w*\.php/',$name) == 1) && (!editsee_App::configFileExists()) ){
 			$filename = $name;
 			$content .= '<?php
 $type		= '."'$type';".'

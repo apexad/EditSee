@@ -25,9 +25,10 @@ class editsee_App {
 
 	public function editsee_App() {
 		//check if a confilg file exits
-		if ($this->configFileExists()) {
+		if ($this->configFileExists() !== false) {
+			$this->config_file = $this->configFileExists();
 			//load the database, populate $this->page
-			require_once($this->config_file);
+			require_once($_SERVER['DOCUMENT_ROOT'].'/'.$this->config_file);
 			$this->db = new editsee_Database($type, trim($host), trim($user), trim($password), trim($database),trim($table_prefix));
 			$this->title = $this->get_config('es_title');
 			$this->header = "\n".'<link rel="alternate" type="application/rss+xml" title="'.$this->get_config('es_title').' &raquo; Feed" href="'.$this->get_config('es_main_url').'feed/" />';
@@ -49,24 +50,25 @@ class editsee_App {
 		}
 	}
 	
-	public function configFileExists() {
+	public static function configFileExists() {
 		//check for a config file
-		$handler = opendir('./');
+		//echo $_SERVER['DOCUMENT_ROOT'];
+		$handler = opendir($_SERVER['DOCUMENT_ROOT'].'/');
 
 		while ((false !== ($file = readdir($handler)))) {
 			if (preg_match('/\w*config\w*\.php/',$file) == 1)
 				$config_file = $file;
 		}
 		if (isset($config_file)) {
-			$this->config_file = $config_file;
-			return true;
+			return $config_file;
 		}
 		else {
 			return false;
 		}
 	}
 	public function connectDatabase() {
-		if ($this->configFileExists()) {
+		if ($this->configFileExists() !== false) {
+			$this->config_file = $this->configFileExists();
 			//load the database, populate $this->page
 			require_once($this->config_file);
 			$this->db = new editsee_Database($type, trim($host), trim($user), trim($password), trim($database),trim($table_prefix));
