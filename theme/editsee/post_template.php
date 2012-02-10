@@ -6,8 +6,7 @@ if ($part != 'innerHTML') {
 			<li><?=date('M jS, Y',strtotime($post['date_entered']))?></li>
 			<li class="write-comment"><a href="<?=$this->get_config('es_main_url')?>post/<?=$post['urltag']?>#comments"><?=$post['comments']?></a></li>
 			<li class="post-edit">
-				<img src="<?=$this->get_config('es_main_url')?>includes/layout/images/post_edit.png" onclick="xajax_updatePost(<?=$post['id']?>)" title="Edit Post" alt="Edit Post" />
-				<img src="<?=$this->get_config('es_main_url')?>includes/layout/images/post_delete.png" onclick="xajax_deletePost(<?=$post['id']?>)" title="Delete Post" alt="Delete Post" />
+				<?=$post['edit']?>
 			</li>
 		</ul>
 	<div class="post-content"><?=$post['content']?></div>

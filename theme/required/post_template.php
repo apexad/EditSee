@@ -10,10 +10,7 @@ if ($part != 'innerHTML') {
 	<h1><a href="<?=$this->get_config('es_main_url')?>post/<?=$post['urltag']?>"><?=$post['title']?></a></h1>
 		<div class="post-info">
 			<span><?=date('M jS, Y',strtotime($post['date_entered']))?></span>
-			<div class="post-edit">
-				<img src="<?=$this->get_config('es_main_url')?>includes/layout/images/post_edit.png" onclick="xajax_updatePost(<?=$post['id']?>)" title="Edit Post" alt="Edit Post" />
-				<img src="<?=$this->get_config('es_main_url')?>includes/layout/images/post_delete.png" onclick="xajax_deletePost(<?=$post['id']?>)" title="Delete Post" alt="Delete Post" />
-			</div>
+			<div class="post-edit"><?=$post['edit']?></div>
 		</div>
 	<div class="post-content"><?=$post['content']?></div>
 	<div class="post-meta">
