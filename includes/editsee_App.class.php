@@ -409,7 +409,7 @@ class editsee_App {
 		$post_edit = '';
 		$check_draft = $this->db->_query("select id from ".$this->db->get_table_prefix()."post where draft='".$post_id."'");
 		if ($check_draft->_num_rows() >= 1) {
-			$post_edit .= '<img src="'.$this->get_config('es_main_url').'includes/layout/images/post_edit_gray.png" onclick="updatePost('.$post_id.'\'draft\',\'from the draft\')" title="Edit Draft" alt="Edit Draft" />';
+			$post_edit .= '<img src="'.$this->get_config('es_main_url').'includes/layout/images/post_edit_gray.png" onclick="updatePost('.$post_id.',\'draft\',\'from the draft\')" title="Edit Draft" alt="Edit Draft" />';
 		}
 		$post_edit .= '&nbsp;<img src="'.$this->get_config('es_main_url').'includes/layout/images/post_edit.png" onclick="updatePost('.$post_id.')" title="Edit Post" alt="Edit Post" />
 						&nbsp;<img src="'.$this->get_config('es_main_url').'includes/layout/images/post_delete.png" onclick="xajax_deletePost('.$post_id.')" title="Delete Post" alt="Delete Post" />';
