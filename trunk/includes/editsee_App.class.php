@@ -33,6 +33,40 @@ class editsee_App {
 			$this->title = $this->get_config('es_title');
 			$this->header = "\n".'<link rel="alternate" type="application/rss+xml" title="'.$this->get_config('es_title').' &raquo; Feed" href="'.$this->get_config('es_main_url').'feed/" />';
 			$this->header .= "\n".'<link rel="stylesheet" type="text/css" href="'.$this->get_config('es_main_url').'includes/layout/main.css" />';
+			$this->header .= "<script type=\"text/javascript\">
+					function saveDraft() {
+        				if (document.getElementById('post_id') != null) {
+        					xajax_saveDraft(document.getElementById('post_id').value
+                                			,document.getElementById('post_title').value
+                                			,document.getElementById('post_urltag').value
+                                			,mynicEditornew.instanceById('post_content').getContent()
+                                			,(document.getElementById('post_category').options[document.getElementById('post_category').selectedIndex]).value
+                                			,document.getElementById('post_type').value);
+							
+							var currentTime = new Date();
+							var the_time = '';
+							var hours = currentTime.getHours();
+							if (hours > 11) { the_time = 'pm'; } else { the_time = 'am'; }
+							if ((hours > 12) || (hours == 0)) { hours = Math.abs(hours-12); }
+							var minutes = currentTime.getMinutes()
+							if (minutes < 10) { minutes = '0' + minutes; }
+							the_time = hours+':'+minutes+the_time;
+							
+							document.getElementById('post_draft_status').innerHTML = '<span style=\"color:green\">Saved at '+the_time+'</span>';
+						}
+        				var draft = setTimeout('saveDraft()','".($this->get_config('es_draft_save_time')*1000)."');
+					}
+					saveDraft();
+					function updatePost(id,mode,content) {
+						if (document.getElementById('post_id') == null) {
+							xajax_updatePost(id,mode,content);
+						}
+						else {
+							alert('Please save/cancel edits on the post you are already editing!');
+						}
+					}
+					</script>";
+
 			if ($this->loggedIn()) {
 				$this->header .= "\n".'<link rel="stylesheet" type="text/css" href="'.$this->get_config('es_main_url').'includes/layout/topbar.css" />';
 				$this->header .= "\n".'<link rel="stylesheet" type="text/css" href="'.$this->get_config('es_main_url').'includes/layout/loggedin.css" />';
@@ -97,6 +131,14 @@ class editsee_App {
 		else {
 			return false;
 		}
+	}
+	public function isPoster() {
+		$poster_check = $this->db->_query("select role from `".$this->db->get_table_prefix()."user` where username='".$_SESSION['username']."'");
+		if (($poster_check->_result(0) == 'poster') || $this->isAdmin()) {
+			return true;
+		}
+		else {
+			return false;		}
 	}
 	public function notLoggedIn($needsAdmin = false) {
 		$message = 'Not logged in';
@@ -229,7 +271,7 @@ class editsee_App {
 						}
 						else {
 								if (substr($editsee_request,0,5) == 'post/') {
-									if (!$this->loggedIn()) { $if_notloggedin = ' and (date_entered <= NOW())'; }
+									if (!$this->loggedIn()) { $if_notloggedin = ' and draft=0 and (date_entered <= NOW())'; }
 									$query = $this->db->_query("select id,title from ".$this->db->get_table_prefix()."post 
 																where (urltag='".substr($editsee_request,5,-1)."' or id='".substr($editsee_request,5,-1)."') 
 																and deleted=0".$if_notloggedin);
@@ -306,36 +348,42 @@ class editsee_App {
 		}
 		return stripslashes($data);
 	}
+	public function update_config($option,$data) {
+		$current = $this->get_config($option); //this will make it if it does not exist
+		return $this->db->_query("update ".$this->db->get_table_prefix()."config set data='".$this->db->_escape_string($data)."' where `option`='".$this->db->_escape_string($option)."'");
+	}
 	public function post_select($extra = '') {
 		return "select 
-		id,title,content,urltag,in_nav,post.type,date_entered,date_entered
-		,(date_entered <= NOW()) as `live`,tag as `simple_category`,page_order
+		id,title,content,urltag,in_nav,post.type,date_entered,draft
+		,(date_entered <= NOW() && draft=0) as `live`,tag as `simple_category`,page_order
 		from ".$this->db->get_table_prefix()."post post 
 		left join ".$this->db->get_table_prefix()."post_tags post_tags on (post.id=post_tags.post_id and post_tags.type='cat')
 		left join ".$this->db->get_table_prefix()."tags tags on tags.tag_id=post_tags.tag_id
 		where deleted=0 ".$extra; 
 	}
 	public function new_post_select($extra_where,$start) {
-		if ($this->loggedIn()) {
 			return $this->db->_limit_query($this->db->get_table_prefix()."post post
 			left join ".$this->db->get_table_prefix()."post_tags post_tags on (post.id=post_tags.post_id and post_tags.type='cat')
-			left join ".$this->db->get_table_prefix()."tags tags on tags.tag_id=post_tags.tag_id",'id','id,title,content,tag as `simple_category`,urltag,post.type,date_entered,(date_entered <= NOW()) as `live`',$start,$this->get_config('es_posts_per_page'),"deleted=0 and post.type='post'".$extra_where,'date_entered desc');
-		}
-		else {
-			return $this->db->_limit_query($this->db->get_table_prefix()."post post
-			left join ".$this->db->get_table_prefix()."post_tags post_tags on (post.id=post_tags.post_id and post_tags.type='cat')
-			left join ".$this->db->get_table_prefix()."tags tags on tags.tag_id=post_tags.tag_id",'id','id,title,content,tag as `simple_category`,urltag,post.type,date_entered,(date_entered <= NOW()) as `live`',$start,$this->get_config('es_posts_per_page'),"deleted=0 and post.type='post' and date_entered <= NOW()".$extra_where,'date_entered desc');
-		}
+			left join ".$this->db->get_table_prefix()."tags tags on tags.tag_id=post_tags.tag_id",'id',
+			'id,title,content,tag as `simple_category`,urltag,post.type,date_entered,draft,(date_entered <= NOW() && draft!=-1) as `live`',
+			$start,$this->get_config('es_posts_per_page'),"deleted=0 and post.type='post'".$extra_where,
+			'draft asc,date_entered desc');
 	}
 	public function get_single_post($post_id,$part='full',$type='post') {
-		if ($this->is_page($post_id))
+		if ($this->is_page($post_id)) {
 			$type='page';
+		}
 		$query = $this->db->_query($this->post_select("and id='".$this->db->_escape_string($post_id)."'",$type));
 		$post = $query->_fetch_assoc();
 		$loggedin = $this->loggedIn();
 		$post['title'] = stripslashes($post['title']);
-		if ($post['live'] == '0')
-					$post['title'] .= ' (Not Live Until '.date('M jS, Y g:ia',strtotime($post['date_entered'])).')';
+		$post['edit'] = $this->get_post_edit($post['id']);
+		if ($post['live'] == '0' && strtotime($post['date_entered']) > time()) {
+				$post['title'] .= ' (Not Live Until '.date('M jS, Y g:ia',strtotime($post['date_entered'])).')';
+		}
+		if ($post['live'] == '0' && $post['draft'] == -1) {
+				$post['title'] .= ' (Not Published - Draft)';
+		}
 		$post['content'] = stripslashes($post['content']);
 		if (($_SERVER['REQUEST_URI'] != '/post/'.$post['urltag']) && (strpos($post['content'],'!--full-post--!'))) {
 			$post['content'] = substr($post['content'],0,strpos($post['content'],'!--full-post--!'));
@@ -356,6 +404,16 @@ class editsee_App {
 		$single_post = ob_get_contents();
 		ob_end_clean();
 		return $single_post;
+	}
+	public function get_post_edit($post_id) {
+		$post_edit = '';
+		$check_draft = $this->db->_query("select id from ".$this->db->get_table_prefix()."post where draft='".$post_id."'");
+		if ($check_draft->_num_rows() >= 1) {
+			$post_edit .= '<img src="'.$this->get_config('es_main_url').'includes/layout/images/post_edit_gray.png" onclick="updatePost('.$post_id.'\'draft\',\'from the draft\')" title="Edit Draft" alt="Edit Draft" />';
+		}
+		$post_edit .= '&nbsp;<img src="'.$this->get_config('es_main_url').'includes/layout/images/post_edit.png" onclick="updatePost('.$post_id.')" title="Edit Post" alt="Edit Post" />
+						&nbsp;<img src="'.$this->get_config('es_main_url').'includes/layout/images/post_delete.png" onclick="xajax_deletePost('.$post_id.')" title="Delete Post" alt="Delete Post" />';
+		return $post_edit;
 	}
 	public function get_post_comment_count($post_id) {
 		$query = $this->db->_query("select count(*) from ".$this->db->get_table_prefix()."comments where linked_post_id='".$post_id."' and deleted=0");
@@ -378,8 +436,12 @@ class editsee_App {
 		while ($post = $query->_fetch_assoc()) {
 			if (($post['live'] == 1) || ($this->loggedIn())) {
 				$post['title'] = stripslashes($post['title']);
-				if ($post['live'] == '0')
+				if ($post['live'] == '0' && strtotime($post['date_entered']) > time()) {
 					$post['title'] .= ' (Not Live Until '.date('M jS, Y g:ia',strtotime($post['date_entered'])).')';
+				}
+				if ($post['live'] == '0' && $post['draft'] == -1) {
+					$post['title'] .= ' (Not Published - Draft)';
+				}
 				$post['content'] = stripslashes($post['content']);
 				if (strpos($post['content'],'!--full-post--!')) {
 					$post['content'] = substr($post['content'],0,strpos($post['content'],'!--full-post--!'));
@@ -388,6 +450,7 @@ class editsee_App {
 				$post['urltag'] = str_replace(array(' ',"'",'"','/','.',',','&'),'-',$post['urltag']);
 				$inside_post_div = 'class="post" id="post-'.$post['id'].'" ondblclick="xajax_updatePost('.$post['id'].',\'quick\')"';
 				$post['comments'] = $this->get_post_comment_count($post['id']);
+				$post['edit'] = $this->get_post_edit($post['id']);
 				ob_start();
 				include('theme/'.$this->get_config('es_theme').'/post_template.php');
 				$post_html = ob_get_contents();
@@ -426,7 +489,7 @@ class editsee_App {
 		echo $page_list;
 	}
 	public function get_post_titles($limit,$links = false) {
-		$query = $this->db->_limit_query($this->db->get_table_prefix().'post','id','id,title,urltag','0',$limit,"deleted=0 and type='post' and date_entered <= NOW()",'date_entered desc');
+		$query = $this->db->_limit_query($this->db->get_table_prefix().'post','id','id,title,urltag','0',$limit,"deleted=0 and draft=0 and type='post' and date_entered <= NOW()",'date_entered desc');
 		$post_title_array = array();
 		while ($post = $query->_fetch_assoc()) {
 			$post['title'] = stripslashes($post['title']);

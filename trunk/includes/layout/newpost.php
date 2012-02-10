@@ -1,6 +1,7 @@
 <?php 
 /* editsee new post (and edit post) template
  * $post array is available to this file when loaded
+ * $project7 variable is also available
  */
 ?>
 <form id="new_post_form" onsubmit="return false;">
@@ -75,17 +76,19 @@
 				echo date('Y-m-d H:i:s');
 				}
 			?>" /></td></tr>
+			<tr><td><div id="post_draft_status"></div></td></tr>
 		<tr>
-			<td><textarea id="post_content-<?=$post['id']?>" style="height:8em;"><?=$post['content']?></textarea></td>
+			<td><textarea id="post_content" style="height:8em;"><?=$post['content']?></textarea></td>
 		</tr>
 		<tr>
 			<td>
 				<input type="hidden" name="post_id" id="post_id" value="<?=$post['id']?>" />
 				<input type="hidden" name="post_type" id="post_type" value="<?=$post_type?>" />
+<?php if ($project7->isPoster()) { ?>
 				<button onclick="xajax_addPost(
 											document.getElementById('post_id').value
 											,document.getElementById('post_title').value
-											,mynicEditor<?=$post['id']?>.instanceById('post_content-<?=$post['id']?>').getContent()
+											,mynicEditornew.instanceById('post_content').getContent()
 											,(document.getElementById('post_category').options[document.getElementById('post_category').selectedIndex]).value
 											,document.getElementById('post_urltag').value
 											,document.getElementById('post_type').value
@@ -94,8 +97,23 @@
 											,(document.getElementById('in_nav').options[document.getElementById('in_nav').selectedIndex]).value
 											,(document.getElementById('page_order_position').options[document.getElementById('page_order_position').selectedIndex]).value
 											,(document.getElementById('page_order_after').options[document.getElementById('page_order_after').selectedIndex]).value
-											<?php } else echo ',0,0,0'; ?>
-										)">save post</button>
+											<?php } else { echo ',0,0,0'; } ?>,0
+										); clearTimeout(draft)">save &amp; publish post</button>
+<?php } ?>
+				<button onclick="xajax_addPost(
+											document.getElementById('post_id').value
+											,document.getElementById('post_title').value
+											,mynicEditornew.instanceById('post_content').getContent()
+											,(document.getElementById('post_category').options[document.getElementById('post_category').selectedIndex]).value
+											,document.getElementById('post_urltag').value
+											,document.getElementById('post_type').value
+											,document.getElementById('post_date').value
+											<?php if ($post_type == 'page') { ?>
+											,(document.getElementById('in_nav').options[document.getElementById('in_nav').selectedIndex]).value
+											,(document.getElementById('page_order_position').options[document.getElementById('page_order_position').selectedIndex]).value
+											,(document.getElementById('page_order_after').options[document.getElementById('page_order_after').selectedIndex]).value
+											<?php } else echo ',0,0,0'; ?>,-1
+										); clearTimeout(draft);">save as draft (unpublished)</button>
 				<button onclick="xajax_cancel_addPost('<?=$post['id']?>','<?=$post_type?>')">cancel</button>
 			</td>
 		</tr>

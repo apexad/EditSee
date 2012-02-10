@@ -5,7 +5,7 @@ global $xajax;
 <head>
 <meta charset="utf-8">
 
-<!-- disable iPhone inital scale -->
+<!-- disable iPhone initial scale -->
 <meta name="viewport" content="width=device-width; initial-scale=1.0">
 
 <title><?php echo $this->title; ?></title>

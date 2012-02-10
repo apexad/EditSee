@@ -77,7 +77,7 @@ $project7->db->_query("CREATE TABLE IF NOT EXISTS `".$table_prefix."post` (
   `type` char(4) NOT NULL,
   `in_nav` tinyint(1) NOT NULL,
   `page_order` int(11) NOT NULL,
-  `draft` tinyint(1) NOT NULL,
+  `draft` int(11) NOT NULL,
   `date_entered` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `date_deleted` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `deleted` tinyint(1) NOT NULL,

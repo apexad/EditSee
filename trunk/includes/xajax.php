@@ -147,16 +147,53 @@ function addComment($name,$email,$humancheck,$text,$post_id) {
 	}
 	return $objResponse;
 }
-$xajax->register(XAJAX_FUNCTION,"addPost");
-function addPost($id,$title,$content,$category,$urltag,$type,$date,$in_nav,$page_order_position,$page_order_after) {
+$xajax->register(XAJAX_FUNCTION,"saveDraft");
+function saveDraft($post_id,$title,$urltag,$content,$category,$type) {
 	$objResponse = new xajaxResponse();
 	$project7 = new editsee_App();
-	if ($project7->loggedIn()) {
+	//fix draft column in old version of EditSee
+	$project7->db->_alter('post','draft','INT( 11 ) NOT NULL');
+	$content = str_replace(array('&lt;','&gt;'),array('<','>'),$content);
+	$content_check = str_replace('<br>','',$content);
+	$urltag_check = str_replace(array('post','page','feed','category'),'',$urltag);
+	if (!empty($title) && !empty($content_check) && !empty($category) && !empty($urltag_check) && $project7->loggedIn()) {
+		if ($post_id == 'new') {
+			$draft_id = '';
+			$post_id = '-1';
+		}
+		else {
+			//find if this post already has a draft (or is a un-published post)
+			$draft_query = $project7->db->_query("select id from `".$project7->db->get_table_prefix()."post`
+													where ((draft='".$post_id."' and type='drft') || 
+													(id='".$post_id."' and draft=-1))");
+			if ($draft_query->_num_rows() >= 1) {
+				$draft_id = $draft_query->_result(0);
+			}
+			else {
+				$draft_id = '';
+			}
+			$type='drft';
+		}
+		$insert_query = $project7->db->_insert_post($draft_id,$title,$content,$category,$urltag,$type,date('Y-m-d H:i:s'),'0','0','0',$post_id);
+		if ($post_id == 'new') {
+			$objResponse->assign('post_id','value',$insert_query); //update post_id
+		}
+	}
+	else {
+		$objResponse->alert($project7->notLoggedIn());
+	}
+	return $objResponse;
+}
+$xajax->register(XAJAX_FUNCTION,"addPost");
+function addPost($id,$title,$content,$category,$urltag,$type,$date,$in_nav,$page_order_position,$page_order_after,$draft) {
+	$objResponse = new xajaxResponse();
+	$project7 = new editsee_App();
+	if ($project7->loggedIn() && ($project7->isPoster() || $draft==-1)) {
 		$content = str_replace(array('&lt;','&gt;'),array('<','>'),$content);
 		$content_check = str_replace('<br>','',$content);
 		$urltag_check = str_replace(array('post','page','feed','category'),'',$urltag);
 		if (!empty($title) && !empty($content_check) && !empty($category) && !empty($urltag_check)) {
-			$insert_query = $project7->db->_insert_post($id,$title,$content,$category,$urltag,$type,$date,$in_nav,$page_order_position,$page_order_after);
+			$insert_query = $project7->db->_insert_post($id,$title,$content,$category,$urltag,$type,$date,$in_nav,$page_order_position,$page_order_after,$draft);
 			if ($id == 'new' && $type != 'page') {
 				ob_start();
 				$project7->display('posts-only');
@@ -184,6 +221,7 @@ function addPost($id,$title,$content,$category,$urltag,$type,$date,$in_nav,$page
 			ob_end_clean();
 			$objResponse->assign('sidebar','innerHTML',$output);
 			$_SESSION['in-quick'.$id] = 'no';
+			$objResponse->script('clearTimeout(draft)');
 		}
 		else {
 			$objResponse->alert('Title, Category, URLtag and Post content are all required.'."\n".
@@ -191,7 +229,7 @@ function addPost($id,$title,$content,$category,$urltag,$type,$date,$in_nav,$page
 		}
 	}
 	else {
-		$objResponse->alert($project7->notLoggedIn());
+		$objResponse->alert(substr($project7->notLoggedIn(),0,-1).' as a Post Editor!');
 	}
 	return $objResponse;
 }
@@ -224,14 +262,14 @@ $xajax->register(XAJAX_FUNCTION,"quickEditPost");
 function quickEditPost($post_id,$content,$title) {
 	$objResponse = new xajaxResponse();
 	$project7 = new editsee_App();
-	if ($project7->loggedIn()) {
+	if ($project7->loggedIn() && $project7->isPoster()) {
 		$content = str_replace(array('&lt;','&gt;'),array('<','>'),$content);
 		$query = $project7->db->_query("update ".$project7->db->get_table_prefix()."post set content='".$project7->db->_escape_string($content)."',title='".$title."' where id='".$post_id."'");
 		$objResponse->assign('post-'.$post_id,'innerHTML',$project7->get_single_post($post_id,'innerHTML'));
 		$_SESSION['in-quick'.$post_id] = 'no';
 	}
 	else {
-		$objResponse->alert($project7->notLoggedIn());
+		$objResponse->alert(substr($project7->notLoggedIn(),0,-1).' as a Post Editor!');
 	}
 	return $objResponse;
 	
@@ -263,8 +301,9 @@ function updatePost($post_id,$mode = 'full',$content = 'not needed') {
 			$post_div = 'new-post';
 			$post['id'] = 'new';
 			$post['content'] = 'enter your new post content here';
-			if ($mode == 'page')
+			if ($mode == 'page') {
 				$objResponse->assign('posts','innerHTML','');
+			}
 			$objResponse->prepend('posts','innerHTML','<div id="new-post" class="post"></div>'); 
 		}
 		else {
@@ -273,6 +312,12 @@ function updatePost($post_id,$mode = 'full',$content = 'not needed') {
 			$post['title'] = stripslashes($post['title']);
 			$post['content'] = stripslashes($post['content']);
 			$post_div = 'post-'.$post['id'];
+			if ($mode == 'draft') {
+				$result = $project7->db->_query("select title,content from ".$project7->db->get_table_prefix()."post where draft='".$post_id."'");
+				$draft = $result->_fetch_assoc();
+				$post['title'] = stripslashes($draft['title']);
+				$post['content'] = stripslashes($draft['content']);
+			}
 		}
 		
 		if ($mode == 'quick') {
@@ -283,26 +328,23 @@ function updatePost($post_id,$mode = 'full',$content = 'not needed') {
 				$quick_edit = ob_get_contents();
 				ob_end_clean();
 				$objResponse->assign('post-'.$post['id'],'innerHTML',$quick_edit);
-				$objResponse->script("mynicEditor".$post['id']." = new nicEditor({iconsPath : '".str_replace('index.php','',$_SERVER['SCRIPT_NAME'])."includes/nicEdit/nicEditorIcons.gif',buttonList : [],uploadURI : 'http://".$_SERVER['HTTP_HOST']."/nicUpload.php'}).panelInstance('post_content-".$post['id']."')");
+				$objResponse->script("mynicEditornew= new nicEditor({iconsPath : '".str_replace('index.php','',$_SERVER['SCRIPT_NAME'])."includes/nicEdit/nicEditorIcons.gif',buttonList : [],uploadURI : 'http://".$_SERVER['HTTP_HOST']."/nicUpload.php'}).panelInstance('post_content')");
 			}
 		}
 		else {
 			if ($mode == 'inquick') {
 				$post['content'] = stripslashes($content);
 			}
-			if ($project7->is_page($post_id))
-				$mode = 'page';
-			if ($mode == 'page') { $post_type = 'page'; }
-			else { $post_type = 'post'; }
+			if ($project7->is_page($post_id)) { $mode = 'page'; }
+			if ($mode == 'page') { $post_type = 'page'; } else { $post_type = 'post'; }
 			$_SESSION['in-quick'.$post_id] = 'yes';
 			ob_start();
 			include('includes/layout/newpost.php');
 			$newpost = ob_get_contents();
 			ob_end_clean();
 			$objResponse->assign($post_div,'innerHTML',$newpost);
-			$objResponse->script("mynicEditor".$post['id']." = new nicEditor({iconsPath : 
-'".str_replace('index.php','',$_SERVER['SCRIPT_NAME'])."includes/nicEdit/nicEditorIcons.gif',fullPanel: 
-true,uploadURI : 'http://".$_SERVER['HTTP_HOST']."/nicUpload.php'}).panelInstance('post_content-".$post['id']."')");
+			$objResponse->script("mynicEditornew = new nicEditor({iconsPath : '".str_replace('index.php','',$_SERVER['SCRIPT_NAME'])."includes/nicEdit/nicEditorIcons.gif',fullPanel: true,uploadURI : 'http://".$_SERVER['HTTP_HOST']."/nicUpload.php'}).panelInstance('post_content')");
+			if ($project7->get_config('es_draft_save_time') == '') { $project7->update_config('es_draft_save_time','60'); }
 		}
 	}
 	else {

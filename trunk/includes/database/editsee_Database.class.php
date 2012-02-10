@@ -69,6 +69,19 @@ class editsee_Database {
 			break;
 		}
 	}
+	public function _alter($table,$column,$newtype) {
+			switch ($this->type) {
+			case 'mssql':
+			case 'sqlsrv':
+				return $this->_query("ALTER TABLE `".$this->table_prefix.$table."` ALTER COLUMN `".$column."` ".$newtype);
+			break;
+			default:
+			case 'mysql':
+				return $this->_query("ALTER TABLE  `".$this->table_prefix.$table."` 
+									  CHANGE  `".$column."`  `".$column."` ".$newtype);
+			break;
+		}
+	}
 	public function _insert_user($user,$role,$password,$email) {
 		return $this->_query("insert into ".$this->table_prefix."user(username,role,password,email) values(
 									'".$this->_escape_string($user)."'
@@ -88,7 +101,7 @@ class editsee_Database {
 		}
 		return $this->_query("update `".$this->table_prefix.$type."` set deleted=0 where ".$id_name."='".$id."'");
 	}
-	public function _insert_post($id,$title,$content,$category,$urltag,$type,$date,$in_nav,$page_order_position,$page_order_after) {
+	public function _insert_post($id,$title,$content,$category,$urltag,$type,$date,$in_nav,$page_order_position,$page_order_after,$draft='0') {
 		$id = $this->_escape_string($id);
 		$title = $this->_escape_string($title);
 		$content = $this->_escape_string($content);
@@ -120,11 +133,13 @@ class editsee_Database {
 				$page_order = $page_order_after+1;
 			break;
 		}
-		
-		$main_insert = $this->_query("insert into ".$this->table_prefix."post(id,user_id,title,content,urltag,type,date_entered,in_nav,page_order) 
-					values('".$id."','".$_SESSION['user_id']."','".$title."','".$content."','".$urltag."','".$type."','".$date."','".$in_nav."','".$page_order."')
+		/*echo "insert into ".$this->table_prefix."post(id,user_id,title,content,urltag,type,date_entered,in_nav,page_order,draft) 
+					values('".$id."','".$_SESSION['user_id']."','".$title."','".$content."','".$urltag."','".$type."','".$date."','".$in_nav."','".$page_order."','".$draft."')";
+		*/
+		$main_insert = $this->_query("insert into ".$this->table_prefix."post(id,user_id,title,content,urltag,type,date_entered,in_nav,page_order,draft) 
+					values('".$id."','".$_SESSION['user_id']."','".$title."','".$content."','".$urltag."','".$type."','".$date."','".$in_nav."','".$page_order."','".$draft."')
 					on duplicate key update 
-					title='".$title."',content='".$content."', urltag='".$urltag."',date_entered='".$date."', in_nav='".$in_nav."',page_order='".$page_order."'");
+					title='".$title."',content='".$content."', urltag='".$urltag."',date_entered='".$date."', in_nav='".$in_nav."',page_order='".$page_order."',draft='".$draft."'");
 		if ($id == 'new') {
 			$id = $main_insert->_insert_id();
 		}
