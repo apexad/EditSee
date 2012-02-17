@@ -783,6 +783,32 @@ NEWCAT;
 																			,document.getElementById('custom_footer_code').value); return false;" />
 CUSTOMFOOTER;
 	break;
+	case 'manage_users':
+		$project7 = new editsee_App();
+		$user_list = 	$project7->get_users('<tr>','<td>data</td>','</tr>');
+		$popup_title = 'Manage Users';
+		$popup_contents = <<<MANUSERS
+		<form id="editsee_manage_users">
+		<h2>Exiting Users</h2>
+		<table id="user_list">
+		<tr><td>Username</td><td>Email</td><td>Role</td><td>&nbsp;</td></tr>
+		$user_list
+		</table>
+		<h2>Add New User</h2>
+		<table>
+		<tr><td>Username:</td><td><input type="text" id="name" /></td></tr>
+		<tr><td>Password:</td><td><input type="password" id="password" /></td></tr>
+		<tr><td>Email:</td><td><input type="text" id="email" /></td></tr>
+		<tr><td>Role:</td><td><select id="role"><option value="poster">Poster</option><option value="author">Author</option><option value="admin">Admin</option></select></td></tr>
+MANUSERS;
+		$popup_contents .='
+			<tr><td colspan="2"><img src="'.$project7->get_config('es_main_url').'includes/layout/images/user_add.png" ';
+		$popup_contents .= <<<MANUSERS
+		onclick="xajax_newUser(document.getElementById('name').value,(document.getElementById('role').options[document.getElementById('role').selectedIndex]).value,document.getElementById('password').value,document.getElementById('email').value); return false;" alt="Add User" title="Add User"/></td>
+		</tr>
+		<tr><td colspan="2" class="submit">	
+MANUSERS;
+	break;
 	default:
 		$popup_title = ucwords(str_replace('_',' ',$popup));
 		$popup_contents .= '<p>This popup does not exist, yet!</p><table><tr><td class="submit">';
@@ -885,6 +911,60 @@ function loadThemeConfig() {
 		$script = ob_get_contents();
 		ob_end_clean();
 		$objResponse->script($script);
+	}
+	return $objResponse;
+}
+$xajax->register(XAJAX_FUNCTION,"newUser");
+function newUser($username,$role,$password,$email) {
+	$objResponse = new xajaxResponse();
+	$project7 = new editsee_App();
+	if ($project7->loggedIn() && $project7->isAdmin()) {
+		if ((stripos($username,'@') === false) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+			$insert_user = $project7->db->_insert_user($username,$role,$password,$email);
+			if ($insert_user->_affected_rows() == 1) {
+				$objResponse->script('	var table=document.getElementById("user_list");
+										var row=table.insertRow(-1);
+										var cell1=row.insertCell(0);
+										var cell2=row.insertCell(1);
+										var cell3=row.insertCell(2);
+										var cell4=row.insertCell(3);
+										cell1.innerHTML="'.$username.'";
+										cell2.innerHTML="'.$email.'";
+										cell3.innerHTML="'.$role.'";
+										cell4.innerHTML="added";
+										
+										document.getElementById("useranme").value="";
+										document.getElementById("email").value="";
+										document.getElementById("password").value="";');
+			}
+			else {
+				$objResponse->alert('Error adding user (Username may already exist)!');
+			}
+		}
+		else {
+			$objResponse->alert('Username cannot contain an @ symbol and E-mail Address must be valid.');
+		}
+	}
+	else {
+		$objResponse->alert($project7->notLoggedIn(true));
+	}
+	return $objResponse;
+}
+$xajax->register(XAJAX_FUNCTION,"deleteUser");
+function deleteUser($user_id,$table_row) {
+	$objResponse = new xajaxResponse();
+	$project7 = new editsee_App();
+	if ($project7->loggedIn() && $project7->isAdmin()) {
+		$delete_user = $project7->db->_query("delete from `".$project7->db->get_table_prefix()."user` where user_id='".$user_id."'");
+		if ($delete_user->_affected_rows() == 1) {
+			$objResponse->script('var table=document.getElementById("user_list"); table.deleteRow("'.$table_row.'");');
+		}
+		else {
+			$objResponse->alert('Unable to delete user!');
+		}
+	}
+	else {
+		$objResponse->alert($project7->notLoggedIn(true));
 	}
 	return $objResponse;
 }
