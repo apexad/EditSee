@@ -458,12 +458,25 @@ function deleteLink($link_id) {
 	return $objResponse;
 }
 $xajax->register(XAJAX_FUNCTION,"siteSettings");
-function siteSettings($site_title,$site_url,$site_desc,$posts_per_page,$homepage,$postpage,$email_comments) {
+function siteSettings($site_title,$main_url,$site_desc,$posts_per_page,$homepage,$postpage,$email_comments,$show_post_author) {
 	$objResponse = new xajaxResponse();
 	$project7 = new editsee_App();
 	if ($project7->loggedIn() && $project7->isAdmin()) {
+		//fix checkboxes
 		$email_comments = ($email_comments) ? '1' : '0';
-		$project7->db->_update_options($site_title,$site_url,$site_desc,$posts_per_page,$homepage,$postpage,$email_comments);
+		$show_post_author = ($show_post_author) ? '1' : '0';
+
+		//update config!
+		$project7->update_config('es_title',$site_title);
+		$project7->update_config('es_main_url',$main_url);
+		$project7->update_config('es_description',$site_desc);
+		$project7->update_config('es_posts_per_page',$posts_per_page);
+		$project7->update_config('es_homepage',$homepage);
+		$project7->update_config('es_postpage',$postpage);
+		$project7->update_config('es_email_comments',$email_comments);
+		$project7->update_config('es_show_post_author',$show_post_author);
+		
+		//redirect!
 		$objResponse->redirect($project7->get_config('es_main_url'));
 	}
 	else {
@@ -682,14 +695,16 @@ THEMESELECT;
 		$description = $project7->get_config('es_description');
 		$posts_per_page = $project7->get_config('es_posts_per_page');
 		$email_comments = ($project7->get_config('es_email_comments') == '1') ? ' checked="checked"' : '';
+		$show_post_author = ($project7->get_config('es_show_post_author') == '1') ? ' checked="checked"' : '';
 		$popup_title = 'Site Settings';
 		$popup_contents = <<<SITESETTINGS
 		<form id="editsee_sitesettings">
 		<table>
 		<tr><td>Site Title:</td><td><input type="text" id="site_title" value="$title" /></td></tr>
-		<tr><td>Site URL:</td><td><input type="text" id="site_url" value="$main_url" /></td></tr>
+		<tr><td>Site URL:</td><td><input type="text" id="main_url" value="$main_url" /></td></tr>
 		<tr><td>Site Description:</td><td><textarea id="site_desc" rows="5">$description</textarea></td>
 		<tr><td>E-mail Comments:</td><td><input type="checkbox" id="email_comments" class="checkbox" value="yes" $email_comments></td></tr>
+		<tr><td>Show Post Author:</td><td><input type="checkbox" id="show_post_author" class="checkbox" value="yes" $show_post_author></td></tr>
 		<tr><td>Post Per Page:</td><td><input type="text" id="posts_per_page" value="$posts_per_page" /></td></tr>
 		<tr><td>Custom Homepage:</td><td>
 							<select id="homepage">
@@ -713,12 +728,13 @@ $popup_contents .= <<<SITESETTINGS
 		<tr><td colspan="2" class="submit">
 		<input type="submit" value="save settings" onclick="xajax_siteSettings(
 													document.getElementById('site_title').value
-													,document.getElementById('site_url').value
+													,document.getElementById('main_url').value
 													,document.getElementById('site_desc').value
 													,document.getElementById('posts_per_page').value
 													,document.getElementById('homepage').value
 													,document.getElementById('postpage').value
 													,document.getElementById('email_comments').checked
+													,document.getElementById('show_post_author').checked
 													); return false;" />
 SITESETTINGS;
 	break;

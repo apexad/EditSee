@@ -4,7 +4,7 @@ if ($part != 'innerHTML') {
 <?php } ?>
 			<header>
 				<h1 class="post-title"><a href="<?=$this->get_config('es_main_url')?>post/<?=$post['urltag']?>"><?=$post['title']?></a></h1>
-				<p class="post-meta"><time class="post-date" datetime="<?=date('Y-m-d H:i:s',strtotime($post['date_entered']))?>" pubdate><?=date('M jS, Y (g:ia)',strtotime($post['date_entered']))?></time> <em>in</em> <a href="<?=$this->get_config('es_main_url')?>category/<?=$post['simple_category']?>" rel="tag"><?=$post['simple_category']?></a> by <?=$post['author']?></p>
+				<p class="post-meta"><time class="post-date" datetime="<?=date('Y-m-d H:i:s',strtotime($post['date_entered']))?>" pubdate><?=date('M jS, Y (g:ia)',strtotime($post['date_entered']))?></time> <em>in</em> <a href="<?=$this->get_config('es_main_url')?>category/<?=$post['simple_category']?>" rel="tag"><?=$post['simple_category']?></a><?php if ($this->get_config('es_show_post_author') == '1') { echo 'by '.$post['author']; } ?></p>
 				<div class="post-edit">
 					<?=$post['edit']?>
 				</div>
