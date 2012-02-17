@@ -228,16 +228,6 @@ class editsee_Database {
 	public function _delete_link($link_id) {
 		return $this->_query("update ".$this->table_prefix."links set deleted='1',date_deleted=".$this->now()." where link_id='".$link_id."'");
 	}
-	public function _update_options($title,$main_url,$description,$posts_per_page,$homepage,$postpage,$email_comments) {
-		$this->_query("update ".$this->table_prefix."config set data='".$this->_escape_string($title)."' where `option`='es_title'");
-		$this->_query("update ".$this->table_prefix."config set data='".$this->_escape_string($main_url)."' where `option`='es_main_url'");
-		$this->_query("update ".$this->table_prefix."config set data='".$this->_escape_string($description)."' where `option`='es_description'");
-		$this->_query("update ".$this->table_prefix."config set data='".$this->_escape_string($posts_per_page)."' where `option`='es_posts_per_page'");
-		$this->_query("update ".$this->table_prefix."config set data='".$this->_escape_string($homepage)."' where `option`='es_homepage'");
-		$this->_query("update ".$this->table_prefix."config set data='".$this->_escape_string($postpage)."' where `option`='es_postpage'");
-		$this->_query("update ".$this->table_prefix."config set data='".$email_comments."' where `option`='es_email_comments'");
-		//$this->_query("update ".$this->table_prefix."post set user_id='".$_SESSION['user_id']."' where user_id='0'");
-}
 	public function _update_user($username,$email) {
 		return $this->_query("update ".$this->table_prefix."user set username='".$this->_escape_string($username)."',email='".$this->_escape_string($email)."' where user_id='".$_SESSION['user_id']."'");
 	}
