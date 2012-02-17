@@ -116,6 +116,25 @@ class editsee_App {
 	else
 		return false;
 	}
+	public function get_users($row_start,$data_format,$row_end) {
+		$users = $this->db->_query("select user_id,username,role,email from `".$this->db->get_table_prefix()."user`");
+		$output = '';
+		$table_row = 1;
+		while ($row = $users->_fetch_assoc()) {
+			$output .= $row_start.str_replace('data',$row['username'],$data_format);
+			$output .= str_replace('data',$row['email'],$data_format);
+			$output .= str_replace('data',$row['role'],$data_format);
+			if ($row['username'] == $_SESSION['username']) {
+				$output .= str_replace('data','<img src="'.$this->get_config('es_main_url').'includes/layout/images/user_edit.png" onclick="xajax_openPopup(\'profile_settings\')" alt="Edit Profile" title="Edit Profile" />',$data_format);
+			}
+			else { 
+				$output .= str_replace('data','<img src="'.$this->get_config('es_main_url').'includes/layout/images/user_delete.png" onclick="xajax_deleteUser('.$row['user_id'].','.$table_row.')" alt="Delete User" title="Delete User" />',$data_format).$row_end;
+			}
+			$output .= $row_end;
+			$table_row++;
+		}
+		return $output;
+	}
 	public function isAdmin() {
 		//first ever auto-database update for EditSee, completed 02-01-2012
 		$test_role = $this->db->_query("SHOW COLUMNS FROM  `".$this->db->get_table_prefix()."user` LIKE  'role'");
@@ -364,8 +383,9 @@ class editsee_App {
 	public function new_post_select($extra_where,$start) {
 			return $this->db->_limit_query($this->db->get_table_prefix()."post post
 			left join ".$this->db->get_table_prefix()."post_tags post_tags on (post.id=post_tags.post_id and post_tags.type='cat')
-			left join ".$this->db->get_table_prefix()."tags tags on tags.tag_id=post_tags.tag_id",'id',
-			'id,title,content,tag as `simple_category`,urltag,post.type,date_entered,draft,(date_entered <= NOW() && draft!=-1) as `live`',
+			left join ".$this->db->get_table_prefix()."tags tags on tags.tag_id=post_tags.tag_id
+			left join ".$this->db->get_table_prefix()."user user on user.user_id=post.user_id",'id',
+			'id,username as `author`,title,content,tag as `simple_category`,urltag,post.type,date_entered,draft,(date_entered <= NOW() && draft!=-1) as `live`',
 			$start,$this->get_config('es_posts_per_page'),"deleted=0 and post.type='post'".$extra_where,
 			'draft asc,date_entered desc');
 	}

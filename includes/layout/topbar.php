@@ -67,7 +67,7 @@ if (!empty($_SESSION['username']) && empty($_SESSION['temp_theme'])) {
 			<li><a onclick="xajax_loadThemeConfig(); return false;">Theme Config</a></li>
 <?php } ?>
 			<li><a onclick="xajax_openPopup('theme_selector'); return false;" class="b">Change Theme</a></li>
-			<li><a onclick="xajax_openPopup('mange_users'); return false;">Manage Users</a></li>
+			<li><a onclick="xajax_openPopup('manage_users'); return false;">Manage Users</a></li>
 	</ul>
 <?php
 	} //ends if (isAdmin())
