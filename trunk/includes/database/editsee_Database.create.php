@@ -14,7 +14,8 @@ $project7->db->_query("INSERT INTO `".$table_prefix."config` (`option`, `data`) 
 ('es_posts_per_page', '5'),
 ('es_homepage', '!posts!'),
 ('es_postpage', 'posts'),
-('es_email_comments', '0');");
+('es_email_comments', '0')
+('es_show_post_author', '0');");
 
 
 //comments table
