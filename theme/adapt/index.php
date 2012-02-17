@@ -41,10 +41,10 @@ global $xajax;
 	<header id="header">
 		
 <?php if (file_exists('images/logo.png')) { ?>
-		<img src="<?=$this->get_config('es_main_url')?>images/logo.png" alt="<?php echo $this->title; ?>" />
+		<img src="<?=$this->get_config('es_main_url')?>images/logo.png" alt="<?=$this->get_config('es_title')?>" />
 <?php } else { ?>
 		<hgroup>
-			<h1 id="site-logo"><a href="#"><?php echo $this->title; ?></a></h1>
+			<h1 id="site-logo"><a href="#"><?=$this->get_config('es_title')?></a></h1>
 			<h2 id="site-description"><?=$this->get_config('es_description')?></h2>
 		</hgroup>
 <?php } ?>
