@@ -28,7 +28,8 @@ class editsee_App {
 		if ($this->configFileExists() !== false) {
 			$this->config_file = $this->configFileExists();
 			//load the database, populate $this->page
-			require_once($_SERVER['DOCUMENT_ROOT'].str_replace('index.php','',$_SERVER['REQUEST_URI']).$this->config_file);
+			require_once($_SERVER['DOCUMENT_ROOT'].'/'.$this->config_file);
+			//require_once($_SERVER['DOCUMENT_ROOT'].str_replace('index.php','',$_SERVER['REQUEST_URI']).$this->config_file);
 			$this->db = new editsee_Database($type, trim($host), trim($user), trim($password), trim($database),trim($table_prefix));
 			$this->title = $this->get_config('es_title');
 			$this->header = "\n".'<link rel="alternate" type="application/rss+xml" title="'.$this->get_config('es_title').' &raquo; Feed" href="'.$this->get_config('es_main_url').'feed/" />';
@@ -69,7 +70,7 @@ class editsee_App {
 
 			if ($this->loggedIn()) {
 				//auto-detect and fix main_url
-				$this->update_config('es_main_url', 'http://'.$_SERVER['HTTP_HOST'].str_replace('index.php','',$_SERVER['REQUEST_URI']));
+				//$this->update_config('es_main_url', 'http://'.$_SERVER['HTTP_HOST'].str_replace('index.php','',$_SERVER['REQUEST_URI']));
 				$this->header .= "\n".'<link rel="stylesheet" type="text/css" href="'.$this->get_config('es_main_url').'includes/layout/topbar.css" />';
 				$this->header .= "\n".'<link rel="stylesheet" type="text/css" href="'.$this->get_config('es_main_url').'includes/layout/loggedin.css" />';
 			}
@@ -88,7 +89,8 @@ class editsee_App {
 	
 	public static function configFileExists() {
 		//check for a config file
-		$handler = opendir($_SERVER['DOCUMENT_ROOT'].str_replace('index.php','',$_SERVER['REQUEST_URI']));
+		//$handler = opendir($_SERVER['DOCUMENT_ROOT'].str_replace('index.php','',$_SERVER['REQUEST_URI']));
+		$handler = opendir($_SERVER['DOCUMENT_ROOT'].'/');
 
 		while ((false !== ($file = readdir($handler)))) {
 			if (preg_match('/\w*config\w*\.php/',$file) == 1)
