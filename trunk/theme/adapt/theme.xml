@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<theme>
+	<style>
+		<element>.post-title a</element>
+		<css>
+			<item>color</item>
+			<value>#6F9926</value>
+		</css>
+		<css>
+			<item>font-weight</item>
+			<value>normal</value>
+		</css>
+	</style>
+	<style>
+		
+	</style>
+</theme>
