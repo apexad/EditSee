@@ -1,5 +1,0 @@
-[10-Dec-2011 12:11:33] PHP Fatal error:  Class 'xajaxRequestPlugin' not found in /home/editsee/public_html/includes/xajax/xajax_core/plugin_layer/xajaxEventPlugin.inc.php on line 41
-[10-Dec-2011 12:15:11] PHP Fatal error:  Class 'xajaxRequestPlugin' not found in /home/editsee/public_html/includes/xajax/xajax_core/plugin_layer/xajaxScriptPlugin.inc.php on line 29
-[10-Dec-2011 12:19:09] PHP Fatal error:  Class 'xajaxRequestPlugin' not found in /home/editsee/public_html/includes/xajax/xajax_core/plugin_layer/xajaxFunctionPlugin.inc.php on line 37
-[10-Dec-2011 12:23:52] PHP Fatal error:  Class 'xajaxRequestPlugin' not found in /home/editsee/public_html/includes/xajax/xajax_core/plugin_layer/xajaxCallableObjectPlugin.inc.php on line 35
-[10-Dec-2011 12:28:40] PHP Fatal error:  Class 'xajaxRequestPlugin' not found in /home/editsee/public_html/includes/xajax/xajax_core/plugin_layer/xajaxDefaultIncludePlugin.inc.php on line 29

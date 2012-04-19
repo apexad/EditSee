@@ -241,7 +241,7 @@ CONTENT
 }
 .post-title a {
 	text-decoration: none;
-	color: #000;
+	/* color: red; */
 }
 .post-meta {
 	margin: 0 0 10px;

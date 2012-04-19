@@ -12,7 +12,9 @@ global $xajax;
 
 <!-- main css -->
 <link href="<?=$this->get_config('es_main_url')?>theme/<?=$this->get_config('es_theme')?>/style.css" rel="stylesheet" type="text/css">
-
+<style type="text/css">
+<?php include('theme/'.$this->get_config('es_theme').'/style.php'); ?>
+</style>
 <!-- media queries css -->
 <link href="<?=$this->get_config('es_main_url')?>theme/<?=$this->get_config('es_theme')?>/media-queries.css" rel="stylesheet" type="text/css">
 

@@ -10,13 +10,10 @@
 	<form enctype="multipart/form-data" method="post" action="">
 	<table>
 		<tr>
-			<td>Background Image:</td><td><input type="file" name="background_image" /></td>
-		</tr>
-		<tr>
 			<td>Post Title Color:</td>
 			<td>
 				<input type="text" name="post_title_color" id="post_title_color"
-				onchange="document.getElementById('post-title').style.color= '#'+this.value" />
+				onchange="document.getElementById('post-title').style.color=this.value" />
 			</td>
 		</tr>
 		<tr>
