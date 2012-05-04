@@ -153,7 +153,7 @@ class editsee_Database {
 		$link_title = $this->_escape_string($link_title);
 		$link_nofollow = str_word_count($link_nofollow);
 		$link_target = $this->_escape_string($link_target);
-		$query = $this->_query("select max(link_order) from links");
+		$query = $this->_query("select max(link_order) from ".$this->table_prefix."links");
 		$max_link_order = $query->_result(0);
 		return $this->_query("insert into ".$this->table_prefix."links(link_order,url,title,nofollow,target)
 					values('".($max_link_order+1)."','".$link_url."','".$link_title."','".$link_nofollow."','".$link_target."')");
