@@ -915,18 +915,19 @@ $xajax->register(XAJAX_FUNCTION,"loadThemeConfig");
 function loadThemeConfig() {
 	$objResponse = new xajaxResponse();
 	$project7 = new editsee_App();
-	if ($project7->loggedIn()) {
+	if ($project7->loggedIn()) {/*
 		ob_start();
-		include('theme/'.$project7->get_config('es_theme').'/config.php');
+		include('theme/'.$project7->get_config('es_theme').'/new-config.php');
 		$config = ob_get_contents();
 		ob_end_clean();
 		$objResponse->assign('posts','innerHTML',$config);
-		
 		ob_start();
 		include('theme/'.$project7->get_config('es_theme').'/config.js');
 		$script = ob_get_contents();
 		ob_end_clean();
 		$objResponse->script($script);
+	 * */
+	$objResponse->assign('posts','innerHTML','<iframe src="http://editsee.com/theme/adapt/new-config.php" width="100%" height="300px"></iframe>');
 	}
 	return $objResponse;
 }
