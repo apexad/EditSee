@@ -226,7 +226,9 @@ class editsee_Database {
 		return $this->_query("update ".$this->table_prefix."post set deleted='1',date_deleted=".$this->now()." where id='".$post_id."'");
 	}
 	public function _delete_link($link_id) {
-		return $this->_query("update ".$this->table_prefix."links set deleted='1',date_deleted=".$this->now()." where link_id='".$link_id."'");
+		//return $this->_query("update ".$this->table_prefix."links set deleted='1',date_deleted=".$this->now()." where link_id='".$link_id."'");
+		//until we write in a 'link restore' let's just delete links rather than mark them as deleted
+		return $this->_query("delete from ".$this->table_prefix."links where link_id='".$link_id."'");
 	}
 	public function _update_user($username,$email) {
 		return $this->_query("update ".$this->table_prefix."user set username='".$this->_escape_string($username)."',email='".$this->_escape_string($email)."' where user_id='".$_SESSION['user_id']."'");
