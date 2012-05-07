@@ -1,19 +1,5 @@
 <?php
 session_start();
-?>
-<html>
-	<head>
-		<title>adapt theme config</title>
-		<script src="http://editsee.com/includes/jscolor/jscolor.js" type="text/javascript"></script>
-		<link rel="stylesheet" type="text/css" href="style.css" />
-		<style type="text/css">
-			<?php $config = true; include('style.php'); ?>
-			body { background:white !important; }
-			.input { border: 1px solid #006; }
-		</style>
-	</head>
-<body>
-<?php
 if(isset($_SESSION['username'])) {
 $filename = 'theme.xml';
 
@@ -48,6 +34,19 @@ foreach ($theme->style as $style) {
 }
 $theme->asXML('theme.xml');
 ?>
+<html>
+	<head>
+		<title>adapt theme config</title>
+		<script src="/includes/jscolor/jscolor.js" type="text/javascript"></script>
+		<link rel="stylesheet" type="text/css" href="style.css" />
+		<link rel="stylesheet" type="text/css" href="/includes/layout/main.css" />
+		<style type="text/css">
+			<?php $config = true; include('style.php'); ?>
+			body { background:white !important; }
+			.input { border: 1px solid #006; }
+		</style>
+	</head>
+<body>
 	<article  class="post" id="theme-config">
 			<header>
 				<h1 class="post-title"><a id="post-title">Adapt Theme Config</a></h1>
@@ -59,9 +58,10 @@ $theme->asXML('theme.xml');
 			<div class="post-content">
 <form name="test" action="" method="post">
 	<label for="post_title_color">Post Title:</label>
-		<input type="text" name="post_title_color" id="post_title_color" />
+		<input type="text" name="post_title_color" id="post_title_color" 
+		onchange="document.getElementById('post-title').style.color=this.value" />
 		<input type="checkbox" name="post_title_bold" value="bold" <?php if ($post_title_bold == 'bold') { echo 'checked="checked"'; } ?> /> bold
-	<input type="submit" value="submit" />
+	<br/><br/><input type="submit" value="submit" />
 </form>
 			</div>
 		</article>
