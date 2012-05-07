@@ -34,6 +34,7 @@ class editsee_App {
 			$this->title = $this->get_config('es_title');
 			$this->header = "\n".'<link rel="alternate" type="application/rss+xml" title="'.$this->get_config('es_title').' &raquo; Feed" href="'.$this->get_config('es_main_url').'feed/" />';
 			$this->header .= "\n".'<link rel="stylesheet" type="text/css" href="'.$this->get_config('es_main_url').'includes/layout/main.css" />';
+			$this->header .= "\n".'<link rel="stylesheet" type="text/css" href="'.$this->get_config('es_main_url').'includes/layout/popup.css" />';
 			$this->header .= "<script type=\"text/javascript\">
 					function saveDraft() {
         				if (document.getElementById('post_id') != null) {

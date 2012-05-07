@@ -1,5 +1,10 @@
 <?php
-$filename = 'theme/'.$this->get_config('es_theme').'/theme.xml';
+if ($config === true) {
+	$filename = 'theme.xml';
+}
+else {
+	$filename = 'theme/'.$this->get_config('es_theme').'/theme.xml';
+}
 
 $theme = simplexml_load_file($filename);
 foreach ($theme->style as $style) {
