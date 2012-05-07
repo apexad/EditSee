@@ -927,7 +927,7 @@ function loadThemeConfig() {
 		ob_end_clean();
 		$objResponse->script($script);
 	 * */
-	$objResponse->assign('posts','innerHTML','<iframe src="http://editsee.com/theme/adapt/new-config.php" width="100%" height="300px"></iframe>');
+	$objResponse->assign('posts','innerHTML','<iframe src="http://editsee.com/theme/adapt/config.php" width="100%" height="300px" frameBorder="0"></iframe>');
 	}
 	return $objResponse;
 }

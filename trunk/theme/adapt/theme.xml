@@ -4,11 +4,11 @@
 		<element>.post-title a</element>
 		<css>
 			<item>color</item>
-			<value>#6F9926</value>
+			<value>#53A11F</value>
 		</css>
 		<css>
 			<item>font-weight</item>
-			<value>normal</value>
+			<value>bold</value>
 		</css>
 	</style>
 	<style>
