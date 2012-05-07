@@ -832,7 +832,7 @@ MANUSERS;
 	$popup_contents .= '<input type="submit" value="cancel" onclick="xajax_closePopup(); return false;" /></td></tr>
 		</table>
 		</form>';
-	$popup_contents = '<div>'.$popup_title.'<button onclick="xajax_closePopup(); return false;">X</button></div>'.$popup_contents;
+	$popup_contents = '<div>'.$popup_title.'<button onclick="xajax_closePopup(); return false;" class="red">Close</button></div>'.$popup_contents;
 	$objResponse->insert("page","div","popup");
 	$objResponse->assign("popup",'innerHTML',$popup_contents);
 	return $objResponse;
