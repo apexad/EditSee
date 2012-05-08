@@ -39,6 +39,7 @@ img {
 #main {
 	background:url(images/side.png) repeat-y;
 	padding-bottom:0px;
+	border-radius:10px;
 }
 #posts { float:left; display:inline; width:570px; margin:0 0 0 5px; }
 .post { margin:60px 0 5px 35px; }
