@@ -16,6 +16,7 @@ function createConfigFile($name,$type,$host,$user,$password,$database,$table_pre
 	if ((preg_match('/\w*config\w*\.php/',$name) == 1) && (!editsee_App::configFileExists()) ){
 			$filename = $name;
 			$content .= '<?php
+/* EditSee config file */
 $type		= '."'$type';".'
 $host 		= '."'$host';".'
 $user		= '."'$user';".'
@@ -915,19 +916,20 @@ $xajax->register(XAJAX_FUNCTION,"loadThemeConfig");
 function loadThemeConfig() {
 	$objResponse = new xajaxResponse();
 	$project7 = new editsee_App();
-	if ($project7->loggedIn()) {/*
+	if ($project7->loggedIn()) {
 		ob_start();
-		include('theme/'.$project7->get_config('es_theme').'/new-config.php');
+		include('theme/'.$project7->get_config('es_theme').'/config.php');
 		$config = ob_get_contents();
 		ob_end_clean();
 		$objResponse->assign('posts','innerHTML',$config);
+
+		$load_script = 'yes';
 		ob_start();
-		include('theme/'.$project7->get_config('es_theme').'/config.js');
+		include('theme/'.$project7->get_config('es_theme').'/config.php');
 		$script = ob_get_contents();
 		ob_end_clean();
 		$objResponse->script($script);
-	 * */
-	$objResponse->assign('posts','innerHTML','<iframe src="http://editsee.com/theme/adapt/config.php" width="100%" height="300px" frameBorder="0"></iframe>');
+	//$objResponse->assign('posts','innerHTML','<iframe src="http://editsee.com/theme/adapt/config.php" width="100%" height="300px" frameBorder="0"></iframe>');
 	}
 	return $objResponse;
 }

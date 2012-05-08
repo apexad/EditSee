@@ -12,6 +12,12 @@ global $xajax;
 
 <!-- main css -->
 <link href="<?=$this->get_config('es_main_url')?>theme/<?=$this->get_config('es_theme')?>/style.css" rel="stylesheet" type="text/css">
+<?php
+if (array_key_exists('theme_config',$_REQUEST)) {
+	$load_script = 'yes';
+	include('theme/adapt/config.php');
+}
+?>
 <style type="text/css">
 <?php include('theme/'.$this->get_config('es_theme').'/style.php'); ?>
 </style>
@@ -31,9 +37,10 @@ global $xajax;
 <!-- editsee stuff -->
 <script src="<?=$this->get_config('es_main_url')?>includes/nicEdit/nicEdit.js" type="text/javascript"></script>
 <script src="<?=$this->get_config('es_main_url')?>includes/jscolor/jscolor.js" type="text/javascript"></script>
-<?php echo $this->header; ?>
-<?php $xajax->printJavascript(); ?>
-
+<script src="<?=$this->get_config('es_main_url')?>includes/jquery-1.7.1.min.js" type="text/javascript"></script>
+<?php echo $this->header;
+$xajax->printJavascript();
+?>
 </head>
 
 <body>
