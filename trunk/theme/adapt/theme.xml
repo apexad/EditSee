@@ -12,6 +12,14 @@
 		</css>
 	</style>
 	<style>
-		
+		<element>#posts</element>
+			<css>
+				<item>opacity</item>
+				<value>0.8</value>
+			</css>
+			<css>
+				<item>filter</item>
+				<value>alpha(opacity=80)</value>
+			</css>
 	</style>
 </theme>

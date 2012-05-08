@@ -226,8 +226,6 @@ CONTENT
 	-webkit-box-shadow: 0 1px 3px rgba(0,0,0,.4);
 	-moz-box-shadow: 0 1px 3px rgba(0,0,0,.4);
 	box-shadow: 0 1px 3px rgba(0,0,0,.4);
-	opacity:0.8;
-	filter:alpha(opacity=80); /* For IE8 and earlier */
 }
 
 /* post */
