@@ -29,7 +29,7 @@ global $xajax;
 	</style>
 </head>
 <body>
-<img src="/includes/layout/images/editsee.png" alt="EditSee logo" />
+<img src="./includes/layout/images/editsee.png" alt="EditSee logo" />
 <div id="content">
 <form id="editsee_install" onsubmit="return false;">
 <table>
