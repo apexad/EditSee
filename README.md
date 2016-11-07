@@ -1,4 +1,4 @@
-![EditSee Logo](http://editsee.org/logo.png)
+![EditSee Logo](https://raw.githubusercontent.com/apexad/EditSee2/39b2d6ef8e3711724ef3e10264ba487f280452ba/logo_300px.png)
 
 EditSee was a small project that I worked on a few years ago, and is in desperate need of a re-write from the ground up.  However, the concepts it used are still important.  Maybe even more important today then when EditSee was written.
 
